@@ -21,14 +21,18 @@ use Illuminate\Http\Request;
 
     Route::post('register', 'User\AuthController@register');
     Route::post('login', 'User\AuthController@login');
-    Route::post('logout','User\AuthController@logout');
+  
+
+    Route::group(['middleware' => 'auth:api'], function () {
+        Route::post('logout','User\AuthController@logout');
+    
+        
+            });
   
 
 //for beauty or salon 
     Route::group(['prefix'=>'stylist'], function () {
       Route::post('register', 'Stylist\AuthController@register');
-
-
 
 
       Route::group(['middleware' => 'auth:api'], function () {
