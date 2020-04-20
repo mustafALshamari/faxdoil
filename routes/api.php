@@ -21,7 +21,7 @@ use Illuminate\Http\Request;
 
     Route::post('register', 'User\AuthController@register');
     Route::post('login', 'User\AuthController@login');
-
+    Route::post('logout','User\AuthController@logout');
   
 
 //for beauty or salon 
