@@ -1,0 +1,51 @@
+image: docker:latest
+services:
+  - docker:latest
+
+variables:
+  IMAGE_WITH_VERSION: $CI_REGISTRY_IMAGE/backend:$CI_COMMIT_TAG
+  IMAGE: $CI_REGISTRY_IMAGE/backend:$CI_RUNNER_TAGS
+  DOCKER_DRIVER: overlay2
+  STACK_PATH: "/srv/${CI_RUNNER_TAGS}"
+
+stages: 
+  - build
+  - deploy
+
+.update_stack: &update_stack
+  script:
+    - cd "$STACK_PATH"
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_TOKEN $CI_REGISTRY
+    - docker stack deploy --with-registry-auth --prune -c docker-compose.yml `basename $(pwd)`
+    - banner Phoenix
+
+.build: &build
+  script:
+    - docker build -t "$IMAGE_WITH_VERSION" -f .ci-cd/Dockerfile .
+    - docker push "$IMAGE_WITH_VERSION"
+    - docker tag "$IMAGE_WITH_VERSION" "$IMAGE"
+    - docker push "$IMAGE"
+    - docker rmi "$IMAGE_WITH_VERSION" 2>/dev/null || true
+
+Build | Development:
+  extends: .docker
+  stage: build
+  tags:
+    - development
+  only:
+    - /^v\d+(\.\d+){1,}-dev$/
+  except:
+    - branches
+  <<: *build
+
+
+Deploy | Development:
+  stage: deploy
+  tags:
+    - development
+  <<: *update_stack
+  only:
+    - /^v\d+(\.\d+){1,}-dev$/
+  except:
+    - branches  
+
