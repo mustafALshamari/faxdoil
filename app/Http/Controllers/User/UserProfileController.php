@@ -42,8 +42,16 @@ class UserProfileController extends Controller
 
         $user_data = User::findOrFail(1);
 
+        $data['name']         = $user_data->name;
+        $data['email']        = $user_data->email;
+        $data['nickname']     = $user_data->nickname;
+        $data['phone_number'] = $user_data->phone_number;
+        $data['location']     = $user_data->location;
+        $data['introduction'] = $user_data->introduction;
+        $data['photo_name']   = $user_data->photo_name;
+
         return response()->json([
-            'data'    => $user_data,
+            'data'    => $data,
             'status'  => 'success',
             'message' => ''
         ]);
@@ -87,7 +95,6 @@ class UserProfileController extends Controller
             );
         }
         $user = Auth::user();
-        $user = User::findOrFail(1);
 
         $user->name         = $request->name;
         $user->email        = $request->email;
