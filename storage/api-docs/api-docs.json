@@ -1,0 +1,105 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "title": "KAI API",
+        "version": "1.0.0"
+    },
+    "host": "localhost:8200",
+    "basePath": "/",
+    "schemes": [
+        "http"
+    ],
+    "paths": {
+        "/api/profile/show": {
+            "get": {
+                "tags": [
+                    "Profile"
+                ],
+                "summary": "Get blog post by id",
+                "description": "Get profile data",
+                "parameters": [
+                    {
+                        "name": "user_id",
+                        "in": "path",
+                        "description": "User id",
+                        "required": true,
+                        "type": "integer"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "schema": {
+                            "$ref": "#/definitions/User"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized user"
+                    }
+                }
+            }
+        },
+        "/api/profile/update": {
+            "post": {
+                "tags": [
+                    "Profile"
+                ],
+                "summary": "Update user profile",
+                "description": "Update profile data",
+                "parameters": [
+                    {
+                        "name": "user_id",
+                        "in": "path",
+                        "description": "User id",
+                        "required": true,
+                        "type": "integer"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "schema": {
+                            "$ref": "#/definitions/User"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized user"
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "User": {
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "nickanme": {
+                    "type": "string"
+                },
+                "age": {
+                    "type": "integer"
+                },
+                "phone_number": {
+                    "type": "string"
+                },
+                "location": {
+                    "type": "string"
+                },
+                "introduction": {
+                    "type": "string"
+                },
+                "photo_name": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}

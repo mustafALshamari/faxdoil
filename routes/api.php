@@ -13,6 +13,51 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
+
+
+
+
+// for user
+
+    Route::post('register', 'User\AuthController@register');
+    Route::post('login', 'User\AuthController@login');
+
+
+    Route::group(['middleware' => 'auth:api'], function () {
+        Route::post('logout','User\AuthController@logout');
+
+
+            });
+
+
+//for beauty or salon
+    Route::group(['prefix'=>'stylist'], function () {
+      Route::post('register', 'Stylist\AuthController@register');
+
+
+      Route::group(['middleware' => 'auth:api'], function () {
+      Route::get('profile','Stylist\ProfileController@index');
+      Route::post('logout','User\AuthController@logout');
+
+      });
+
+});
+//for admin
+
+
+Route::group(['prefix' => 'admin'], function () {
+    Route::post('register', 'AdminController@register');
+    Route::post('login', 'AdminController@login');
+
+});
+
+//for user profile
+Route::group(['prefix' => 'profile'], function (){
+    Route::get('show', 'User\UserProfileController@show');
+    Route::post('update', 'User\UserProfileController@update');
+});
+
+Route::group(['middleware' => 'auth:api'], function(){
+
+
 });
