@@ -6,5 +6,14 @@ use Illuminate\Database\Eloquent\Model;
 
 class Services extends Model
 {
-    //
+    protected $fillable = 
+    [
+        'name',
+        'price',
+        'salon_id',
+    ];
 }
+
+
+
+ 

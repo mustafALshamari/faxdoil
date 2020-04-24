@@ -16,7 +16,7 @@ class CreateServicesTable extends Migration
         Schema::create('services', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('name');
-            $table->double('price')->nullable;
+            $table->double('price')->nullable();
             $table->unsignedBigInteger('salon_id')->nullable(); 
             $table->foreign('salon_id')->references('id')->on('salons'); 
             $table->bigIncrements('id');

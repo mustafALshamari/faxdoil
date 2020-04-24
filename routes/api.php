@@ -17,17 +17,17 @@ use Illuminate\Http\Request;
 
 
 
-// for user 
+// for user
 
     Route::post('register', 'User\AuthController@register');
     Route::post('login', 'User\AuthController@login');
-    
+
     Route::group(['middleware' => 'auth:api'], function () {
     Route::post('logout','User\AuthController@logout');
     });
-  
 
-//for beauty or salon 
+
+//for beauty or salon
     Route::group(['prefix'=>'stylist'], function () {
     Route::post('register', 'Stylist\AuthController@register');
 
@@ -40,9 +40,18 @@ use Illuminate\Http\Request;
     Route::get('show_my_salon', 'Stylist\SalonController@showMysalon');
     Route::get('show_my_location', 'Stylist\SalonController@showMyLocation');
 
-    Route::post('logout','User\AuthController@logout');
-
     });
 
+
+//for user profile
+Route::group(['prefix' => 'profile'], function (){
+    Route::get('show', 'User\UserProfileController@show');
+    Route::post('update', 'User\UserProfileController@update');
+});
+
+Route::group(['middleware' => 'auth:api'], function(){
+
+
+});
+
     });
-//for admin 
