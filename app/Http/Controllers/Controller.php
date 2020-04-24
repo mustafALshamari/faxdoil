@@ -9,7 +9,7 @@ use Illuminate\Routing\Controller as BaseController;
 /**
  * @SWG\Swagger(
  *   schemes={"http"},
- *   host="localhost:8200",
+ *   host="localhost:8000",
  *   basePath="/",
  *   @SWG\Info(
  *     title="KAI API",

@@ -10,7 +10,7 @@ use DB;
 class ProfileController extends Controller
 {
     /**
-     * @return 
+     * @return
      * the Stylist info from both tables
      * User and Styist
      */
