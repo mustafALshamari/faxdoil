@@ -40,7 +40,7 @@ class UserProfileController extends Controller
     {
         $id = Auth::id();
 
-        $user_data = User::findOrFail(1);
+        $user_data = User::findOrFail($id);
 
         $data['name']         = $user_data->name;
         $data['email']        = $user_data->email;
@@ -94,15 +94,15 @@ class UserProfileController extends Controller
                 401
             );
         }
-        $user = Auth::user();
 
+        $user               = Auth::user();
         $user->name         = $request->name;
         $user->email        = $request->email;
         $user->nickname     = $request->nickname;
         $user->phone_number = $request->phone_number;
 
         if ($request->location) {
-            $user->location     = $request->location;
+            $user->location         = $request->location;
         }
 
         if ($request->introduction) {
@@ -120,14 +120,20 @@ class UserProfileController extends Controller
             $user->photo_name = 'some_path'.$photo_new_name;
         }
 
+        $data['name']         = $user->name;
+        $data['email']        = $user->email;
+        $data['nickname']     = $user->nickname;
+        $data['phone_number'] = $user->phone_number;
+        $data['location']     = $user->location;
+        $data['introduction'] = $user->introduction;
+        $data['photo_name']   = $user->photo_name;
+
         $user->save();
 
         return response()->json([
-            'data'    => $user,
+            'data'    => $data,
             'status'  => 'success',
             'message' => 'The profile has been updated successfully.'
         ]);
-
-
     }
 }
