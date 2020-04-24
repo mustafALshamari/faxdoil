@@ -48,11 +48,46 @@
                 "description": "Update profile data",
                 "parameters": [
                     {
-                        "name": "user_id",
+                        "name": "name",
                         "in": "path",
-                        "description": "User id",
+                        "description": "User name",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "email",
+                        "in": "path",
+                        "description": "User email",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "nickname",
+                        "in": "path",
+                        "description": "User nickname",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "age",
+                        "in": "path",
+                        "description": "User age",
                         "required": true,
                         "type": "integer"
+                    },
+                    {
+                        "name": "phone_number",
+                        "in": "path",
+                        "description": "User phone_number",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "introduction",
+                        "in": "path",
+                        "description": "User introduction",
+                        "required": true,
+                        "type": "string"
                     }
                 ],
                 "responses": {
@@ -98,6 +133,22 @@
                 },
                 "photo_name": {
                     "type": "string"
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "passport": {
+            "type": "oauth2",
+            "description": "Laravel passport oauth2 security.",
+            "in": "header",
+            "scheme": "https",
+            "flows": {
+                "password": {
+                    "authorizationUrl": "http://localhost:8200/oauth/authorize",
+                    "tokenUrl": "http://localhost:8200/oauth/token",
+                    "refreshUrl": "http://localhost:8200/token/refresh",
+                    "scopes": []
                 }
             }
         }
