@@ -22,6 +22,3 @@
 - `$ php artisan key:generate`
 - `$ php artisan passport:install`
 - `$ php artisan passport:client --personal`
-
-
-
