@@ -45,5 +45,4 @@ class Salon extends Model
         'latitude',
         'longitude'
     ];
-
 }
