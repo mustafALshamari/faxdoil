@@ -109,10 +109,6 @@ class UserProfileController extends Controller
             $user->introduction     = $request->introduction;
         }
 
-        if ($request->introduction) {
-            $user->introduction     = $request->introduction;
-        }
-
         if ($request->hasFile("photo_name")) {
             $photo            = $request->photo_name;
             $photo_new_name   = time(). '.' .$request->photo_name->extension();
