@@ -9,7 +9,10 @@ use Illuminate\Http\Request;
 use App\User;
 use Auth;
 
-
+/**
+ * Class UserProfileController
+ * @package App\Http\Controllers\User
+ */
 class UserProfileController extends Controller
 {
     /**
@@ -84,8 +87,8 @@ class UserProfileController extends Controller
     public function update(Request $request)
     {
         $validate = Validator::make($request->all(),[
-            "name"      => "required",
-            "email"     => "required"
+            "name"  => "required",
+            "email" => "required"
         ]);
 
         if ($validate->fails()){
@@ -102,11 +105,11 @@ class UserProfileController extends Controller
         $user->phone_number = $request->phone_number;
 
         if ($request->location) {
-            $user->location         = $request->location;
+            $user->location = $request->location;
         }
 
         if ($request->introduction) {
-            $user->introduction     = $request->introduction;
+            $user->introduction = $request->introduction;
         }
 
         if ($request->hasFile("photo_name")) {

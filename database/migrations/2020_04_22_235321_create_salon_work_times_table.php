@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateStylistsTable extends Migration
+class CreateSalonWorkTimesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,11 +13,8 @@ class CreateStylistsTable extends Migration
      */
     public function up()
     {
-        Schema::create('stylists', function (Blueprint $table) {
+        Schema::create('salon_work_times', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->unsignedBigInteger('user_id'); 
-            $table->foreign('user_id')->references('id')->on('users'); 
-            $table->tinyInteger('is_salon_owner')->default(0);
             $table->unsignedBigInteger('salon_id')->nullable(); 
             $table->foreign('salon_id')->references('id')->on('salons'); 
             $table->timestamps();
@@ -31,6 +28,6 @@ class CreateStylistsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('stylists');
+        Schema::dropIfExists('salon_work_times');
     }
 }
