@@ -4,8 +4,8 @@ WORKDIR /var/www/api
 EXPOSE 80
 
 RUN apt-get update -y \
-    && apt-get install -y vim git nginx zip curl \
-    && docker-php-ext-install pdo_pgsql pgsql \
+    && apt-get install -y vim git nginx zip curl libpq-dev \
+    && docker-php-ext-install pdo pdo_pgsql \
     && docker-php-ext-install opcache \
     && apt-get install libicu-dev -y \
     && docker-php-ext-install intl \
@@ -13,8 +13,9 @@ RUN apt-get update -y \
     && apt-get remove libicu-dev icu-devtools -y \
     && mkdir -p /run/nginx && \
         curl --silent --show-error https://getcomposer.org/installer | php && \
-        mv ./composer.phar /usr/bin/composer && \
-    { \
+        mv ./composer.phar /usr/bin/composer
+
+RUN { \
         echo 'opcache.memory_consumption=128'; \
         echo 'opcache.interned_strings_buffer=8'; \
         echo 'opcache.max_accelerated_files=4000'; \
