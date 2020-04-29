@@ -2,17 +2,17 @@
 
 namespace App\Http\Controllers\Stylist;
 
-use App\User; 
+use App\User;
 use App\Stylist;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth; 
+use Illuminate\Support\Facades\Auth;
 use Validator;
 
 class AuthController extends Controller
 {
     public $successStatus = 200;
-  
+
      /**
      * @SWG\Post(
      *     path="/api/stylist/register",
@@ -20,9 +20,9 @@ class AuthController extends Controller
      *     tags={"Auth"},
      *     description="register new stylist",
      *     @SWG\Parameter(
-     *         name="name",
+     *         name="username",
      *         in="path",
-     *         description="user's name",
+     *         description="username",
      *         required=true,
      *         type="string",
      *     ),
@@ -49,25 +49,25 @@ class AuthController extends Controller
      *         response="401",
      *         description="validation error",
      *     ),
-     * 
+     *
      * )
      */
-    public function register(Request $request) 
-    { 
-        $validator = Validator::make($request->all(), [ 
+    public function register(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
             'name'     => 'required',
             'email'    => 'required|unique:users',
-            'password' => 'required', 
-    
+            'password' => 'required',
+
         ]);
 
-        if ($validator->fails()) { 
-            return response()->json(['error'=>$validator->errors()], 401);            
+        if ($validator->fails()) {
+            return response()->json(['error'=>$validator->errors()], 401);
         }
 
         $input = $request->all();
 
-        $input['password'] = bcrypt($input['password']); 
+        $input['password'] = bcrypt($input['password']);
         $user              = User::create($input);
         $thisUser          = User::findOrfail($user->id);
         $stylist           = Stylist::create(['user_id'=> $thisUser->id]);
@@ -79,5 +79,5 @@ class AuthController extends Controller
 
         return response()->json(['success'=>$success], $this->successStatus);
     }
-    
+
 }

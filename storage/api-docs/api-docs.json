@@ -19,9 +19,9 @@
                 "description": "register new stylist",
                 "parameters": [
                     {
-                        "name": "name",
+                        "name": "username",
                         "in": "path",
-                        "description": "user's name",
+                        "description": "username",
                         "required": true,
                         "type": "string"
                     },
@@ -61,6 +61,13 @@
                 "summary": "create salon",
                 "description": "create new salon",
                 "parameters": [
+                    {
+                        "name": "name",
+                        "in": "path",
+                        "description": "salon's name",
+                        "required": true,
+                        "type": "string"
+                    },
                     {
                         "name": "name",
                         "in": "path",
@@ -235,19 +242,10 @@
         "/api/profile/show": {
             "get": {
                 "tags": [
-                    "Profile"
+                    "User Profile"
                 ],
-                "summary": "Get blog post by id",
-                "description": "Get profile data",
-                "parameters": [
-                    {
-                        "name": "user_id",
-                        "in": "path",
-                        "description": "User id",
-                        "required": true,
-                        "type": "integer"
-                    }
-                ],
+                "summary": "Get user profile",
+                "description": "Get user profile",
                 "responses": {
                     "200": {
                         "description": "successful operation",
@@ -257,6 +255,9 @@
                     },
                     "401": {
                         "description": "Unauthorized user"
+                    },
+                    "500": {
+                        "description": "error something went wrong"
                     }
                 }
             }
@@ -264,15 +265,15 @@
         "/api/profile/update": {
             "post": {
                 "tags": [
-                    "Profile"
+                    "User Profile"
                 ],
                 "summary": "Update user profile",
                 "description": "Update profile data",
                 "parameters": [
                     {
-                        "name": "name",
+                        "name": "username",
                         "in": "path",
-                        "description": "User name",
+                        "description": "User username",
                         "required": true,
                         "type": "string"
                     },
@@ -291,23 +292,40 @@
                         "type": "string"
                     },
                     {
-                        "name": "age",
-                        "in": "path",
-                        "description": "User age",
-                        "required": true,
-                        "type": "integer"
-                    },
-                    {
                         "name": "phone_number",
                         "in": "path",
-                        "description": "User phone_number",
+                        "description": "User phone number",
                         "required": true,
                         "type": "string"
+                    },
+                    {
+                        "name": "location",
+                        "in": "path",
+                        "description": "User location",
+                        "required": true,
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
                     },
                     {
                         "name": "introduction",
                         "in": "path",
                         "description": "User introduction",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "profile_photo",
+                        "in": "path",
+                        "description": "User profile_photo",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "background_photo",
+                        "in": "path",
+                        "description": "User background_photo",
                         "required": true,
                         "type": "string"
                     }
@@ -321,6 +339,9 @@
                     },
                     "401": {
                         "description": "Unauthorized user"
+                    },
+                    "500": {
+                        "description": "error something went wrong"
                     }
                 }
             }
@@ -354,13 +375,13 @@
                 "id": {
                     "type": "integer"
                 },
-                "name": {
+                "username": {
                     "type": "string"
                 },
                 "email": {
                     "type": "string"
                 },
-                "nickanme": {
+                "nickname": {
                     "type": "string"
                 },
                 "age": {
@@ -370,12 +391,18 @@
                     "type": "string"
                 },
                 "location": {
-                    "type": "string"
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 },
                 "introduction": {
                     "type": "string"
                 },
-                "photo_name": {
+                "profile_photo": {
+                    "type": "string"
+                },
+                "background_photo": {
                     "type": "string"
                 }
             }

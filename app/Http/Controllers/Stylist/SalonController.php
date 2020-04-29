@@ -49,10 +49,16 @@ class SalonController extends Controller
      *         required=true,
      *         type="string",
      *     ),
+     *     @SWG\Parameter(
+     *         name="name",
+     *         in="path",
+     *         description="salon's name",
+     *         required=true,
+     *         type="string",
+     *     ),
      *     @SWG\Response(
      *         response=200,
      *         description="successful operation message with user Token and user name",
-     *      
      *     ),
      *     @SWG\Response(
      *         response="409",
@@ -66,7 +72,7 @@ class SalonController extends Controller
      *         response="500",
      *         description="error something went wrong",
      *     ),
-     * 
+     *
      * )
      */
     public function createSalon(Request $request)
@@ -102,7 +108,7 @@ class SalonController extends Controller
     /**
      * return data form stylist
      * table by using stylist id
-     * @return array  
+     * @return array
      */
     public function findStylistById($id)
     {
@@ -130,7 +136,6 @@ class SalonController extends Controller
      *         required=false,
      *         type="string",
      *     ),
-     * 
      *     @SWG\Response(
      *         response=200,
      *         description="successful operation message with user Token and user name",
@@ -144,7 +149,7 @@ class SalonController extends Controller
      *         response="500",
      *         description="error something went wrong",
      *     ),
-     * 
+     *
      * )
      */
     public function updateSalonInfo(Request $request)
@@ -180,7 +185,7 @@ class SalonController extends Controller
 
     /**
      *  Salon owner updating his own images
-     * for salon 
+     * for salon
      *
      * @param  \Illuminate\Http\Request  $request
      *
@@ -210,7 +215,7 @@ class SalonController extends Controller
                 $salon->images = json_encode($data);
 
                 $salon->save();
-                
+
                 return response()->json(['success','images uploaded successfully'],200);
             }
          } catch (Exception $e) {
@@ -257,13 +262,13 @@ class SalonController extends Controller
        try {
            $salonOwner = $this->findStylistById(Auth::id());
            $mySalon = Salon::find($salonOwner)->first();
-           
+
            return response()->json(['salon' => $mySalon], 200);
        } catch (Exception $e) {
            return response()->json(['error' => 'something went wrong!'], 500);
        }
     }
-    
+
      /**
      * Salon owner updates location
      *
@@ -274,7 +279,7 @@ class SalonController extends Controller
         try {
             $salonOwner = $this->findStylistById(Auth::id());
             $mySalon = Salon::find($salonOwner)->first();
-            
+
             return response()->json([
                 'location' =>
                     [

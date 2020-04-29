@@ -16,7 +16,7 @@ use Laravel\Passport\HasApiTokens;
  *      type="integer"
  *  ),
  *  @SWG\Property(
- *      property="name",
+ *      property="username",
  *      type="string"
  *  ),
  *  @SWG\Property(
@@ -24,7 +24,7 @@ use Laravel\Passport\HasApiTokens;
  *      type="string"
  *  ),
  *  @SWG\Property(
- *      property="nickanme",
+ *      property="nickname",
  *      type="string"
  *  ),
  *  @SWG\Property(
@@ -37,14 +37,20 @@ use Laravel\Passport\HasApiTokens;
  *  ),
  *  @SWG\Property(
  *      property="location",
- *      type="string"
+ *      type="array",
+ *      @SWG\Items(type="string")
+ *
  *  ),
  *  @SWG\Property(
  *      property="introduction",
  *      type="string"
  *  ),
  *  @SWG\Property(
- *      property="photo_name",
+ *      property="profile_photo",
+ *      type="string"
+ *  ),
+ *  @SWG\Property(
+ *      property="background_photo",
  *      type="string"
  *  )
  * )
@@ -59,7 +65,7 @@ class User extends Authenticatable
      *
      * @var array
      */
-    protected $fillable = 
+    protected $fillable =
     [
         'name',
         'email',
@@ -68,7 +74,7 @@ class User extends Authenticatable
         'age',
         'phone_number',
         'location',
-        'introduction', 
+        'introduction',
         'photo_name'
     ];
 

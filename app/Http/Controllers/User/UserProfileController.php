@@ -18,16 +18,9 @@ class UserProfileController extends Controller
     /**
      * @SWG\Get(
      *     path="/api/profile/show",
-     *     summary="Get blog post by id",
-     *     tags={"Profile"},
-     *     description="Get profile data",
-     *     @SWG\Parameter(
-     *         name="user_id",
-     *         in="path",
-     *         description="User id",
-     *         required=true,
-     *         type="integer",
-     *     ),
+     *     summary="Get user profile",
+     *     tags={"User Profile"},
+     *     description="Get user profile",
      *     @SWG\Response(
      *         response=200,
      *         description="successful operation",
@@ -36,6 +29,10 @@ class UserProfileController extends Controller
      *     @SWG\Response(
      *         response="401",
      *         description="Unauthorized user",
+     *     ),
+     *     @SWG\Response(
+     *         response="500",
+     *         description="error something went wrong",
      *     )
      * )
      */
@@ -64,14 +61,64 @@ class UserProfileController extends Controller
      * @SWG\Post(
      *     path="/api/profile/update",
      *     summary="Update user profile",
-     *     tags={"Profile"},
+     *     tags={"User Profile"},
      *     description="Update profile data",
      *     @SWG\Parameter(
-     *         name="user_id",
+     *         name="username",
      *         in="path",
-     *         description="User id",
+     *         description="User username",
      *         required=true,
-     *         type="integer",
+     *         type="string",
+     *     ),
+     *     @SWG\Parameter(
+     *         name="email",
+     *         in="path",
+     *         description="User email",
+     *         required=true,
+     *         type="string",
+     *     ),
+     *     @SWG\Parameter(
+     *         name="nickname",
+     *         in="path",
+     *         description="User nickname",
+     *         required=true,
+     *         type="string",
+     *     ),
+     *     @SWG\Parameter(
+     *         name="phone_number",
+     *         in="path",
+     *         description="User phone number",
+     *         required=true,
+     *         type="string",
+     *     ),
+     *     @SWG\Parameter(
+     *         name="location",
+     *         in="path",
+     *         description="User location",
+     *         required=true,
+     *         type="array",
+     *         @SWG\Items(type="string")
+     *     ),
+     *     @SWG\Parameter(
+     *         name="introduction",
+     *         in="path",
+     *         description="User introduction",
+     *         required=true,
+     *         type="string",
+     *     ),
+     *     @SWG\Parameter(
+     *         name="profile_photo",
+     *         in="path",
+     *         description="User profile_photo",
+     *         required=true,
+     *         type="string",
+     *     ),
+     *     @SWG\Parameter(
+     *         name="background_photo",
+     *         in="path",
+     *         description="User background_photo",
+     *         required=true,
+     *         type="string",
      *     ),
      *     @SWG\Response(
      *         response=200,
@@ -81,6 +128,10 @@ class UserProfileController extends Controller
      *     @SWG\Response(
      *         response="401",
      *         description="Unauthorized user",
+     *     ),
+     *     @SWG\Response(
+     *         response="500",
+     *         description="error something went wrong",
      *     )
      * )
      */
