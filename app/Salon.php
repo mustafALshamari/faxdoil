@@ -45,6 +45,7 @@ class Salon extends Model
         'latitude',
         'longitude'
     ];
+    
     public function service()
     {
         return $this->hasMany('App\Services');

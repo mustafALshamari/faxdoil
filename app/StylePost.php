@@ -14,7 +14,6 @@ class StylePost extends Model
  *      property="stylist_id",
  *      type="integer"
  *  ),
-
  *  @SWG\Property(
  *      property="description",
  *      type="string"

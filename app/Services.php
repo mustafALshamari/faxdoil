@@ -9,7 +9,6 @@ class Services extends Model
 /**
  * @SWG\Definition(
  *  definition="Services",
-
  *  @SWG\Property(
  *      property="name",
  *      type="string"
@@ -18,7 +17,6 @@ class Services extends Model
  *      property="price",
  *      type="string"
  *  ),
-
  * )
  */
     protected $fillable = 
@@ -32,7 +30,6 @@ class Services extends Model
     {
         return $this->belongsTo('App\Salon');
     }
-
 }
 
 

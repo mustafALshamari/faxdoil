@@ -12,6 +12,7 @@ use Validator;
 use Exception;
 use DB;
 use Auth;
+use File;
 
 class SalonController extends Controller
 {
@@ -59,8 +60,7 @@ class SalonController extends Controller
      *     ),
      *     @SWG\Response(
      *         response=200,
-     *         description="successful operation message ",
-     *      
+     *         description="successful operation message ",   
      *     ),
      *     @SWG\Response(
      *         response="422",
@@ -70,7 +70,6 @@ class SalonController extends Controller
      *         response="500",
      *         description="error something went wrong",
      *     ),
-     * 
      * )
      */
 
@@ -80,56 +79,54 @@ class SalonController extends Controller
            $request->all() ,[
             'name'      => 'required',
             'location'  => '',
-            'images'    => 'max:10',
             'images.*'  => 'mimes:jpg,jpeg,gif,png',
         ]);
 
-    try {
-        if ($validator->fails()) {
-            return response()->json(['error' => $validator->errors()], 422);
-        }
-
-        $stylist = $this->findStylistById(Auth::id());
-        $salon = Salon::find($stylist->salon_id);
-
-        if ($salon) {
-            $this->updateSalon($salon , $request);
-        }
-
-        else{
-            $salon = new Salon();
-            
-            if ($request->name) {
-                $salon->name = $request->name;
+        try {
+            if ($validator->fails()) {
+                return response()->json(['error' => $validator->errors()], 422);
             }
 
-            if ($request->location) {
-                foreach ($request->location as $key => $value) {
-                    $salon->address   = $value['address'];
-                    $salon->latitude  = $value['latitude'];
-                    $salon->longitude = $value['longitude'];
-               }
-            }
+            $stylist = $this->findStylistById(Auth::id());
+            $salon = Salon::find($stylist->salon_id);
 
-            if ($request->hasFile('images')) {
-                foreach ($request->file('images') as $file) {
-                    $name = time().'.'.$file->getClientOriginalName();
-                    $file->move(public_path().'/uploads/salon/'. Auth::id() , $name);
-                    $data[] = $name; 
+            if ($salon) {
+                $this->updateSalon($salon , $request);
+            }
+            else{
+                $salon = new Salon();
+                
+                if ($request->name) {
+                    $salon->name = $request->name;
                 }
-                $salon->images = json_encode($data);
-            }
-        }
 
-        $salon->save();
-        $stylist           = $this->findStylistById(Auth::id());
-        $stylist->salon_id = $salon->id;
-        $stylist->save();
+                if ($request->location) {
+                    foreach ($request->location as $key => $value) {
+                        $salon->address   = $value['address'];
+                        $salon->latitude  = $value['latitude'];
+                        $salon->longitude = $value['longitude'];
+                    }
+                }
+
+                if ($request->hasFile('images')) {
+                    foreach ($request->file('images') as $file) {
+                        $name = time().'.'.$file->getClientOriginalName();
+                        $file->move(public_path().'/uploads/salon/'. Auth::id() , $name);
+                        $data[] = $name; 
+                    }
+                    $salon->images = json_encode($data);
+                }
+            }
+
+            $salon->save();
+            $stylist           = $this->findStylistById(Auth::id());
+            $stylist->salon_id = $salon->id;
+            $stylist->save();
 
             return response()->json(['success','successfully created your salon'], 200);
-        } catch (Exception $e) {
-            return response()->json(['error' => 'something went wrong!'], 500);
-        }
+            } catch (Exception $e) {
+                return response()->json(['error' => 'something went wrong!'], 500);
+            }
     }
 
     /**
@@ -167,7 +164,7 @@ class SalonController extends Controller
                 $salon->images = json_encode($data);
             }
 
-                return response()->json(['success' => 'successfully updated your info'],200);
+            return response()->json(['success' => 'successfully updated your salon'],200);
             } catch (Exception $e) {
                 return response()->json(['error' => 'something went wrong!'], 500);
             }
@@ -279,7 +276,7 @@ class SalonController extends Controller
             $mySalon = Salon::find($salonOwner)->first();
             
             return response()->json(
-                ['location' => ['address' => $mySalon->address ,
+                ['location' => ['address'  => $mySalon->address ,
                                 'latitude' => $mySalon->latitude ,
                                'longitude' => $mySalon->longitude] ]
                                , 200);
@@ -287,6 +284,7 @@ class SalonController extends Controller
             return response()->json(['error' => 'something went wrong!'], 500);
         }
      }
+
      /**
      * @SWG\Post(
      *     path="/api/stylist/add_service",

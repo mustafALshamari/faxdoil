@@ -51,7 +51,6 @@ class StylePostController extends Controller
      *         required=false,
      *         type="string",
      *     ),
-     * 
      *     @SWG\Parameter(
      *         name="style_name",
      *         in="path",
@@ -70,7 +69,6 @@ class StylePostController extends Controller
      *         response=200,
      *         description="successful operation message ",
      *         @SWG\Schema(ref="#/definitions/StylePost")
-     *      
      *     ),
      *     @SWG\Response(
      *         response="422",
@@ -80,74 +78,71 @@ class StylePostController extends Controller
      *         response="500",
      *         description="error something went wrong",
      *     ),
-     * 
      * )
      */
     public function createStylePost(Request $request)
     {
        $validator =  Validator::make(
            $request->all() ,[
-            'images'     => 'required|max:10',
+            'images'     => 'required',
             'images.*'   => 'mimes:jpg,jpeg,gif,png',
             'desc'       => 'max:2000',
             'tag'        => '',
             'brand_name' => '',
             'style_name' => '',
             'color'      => '',
-            
         ]);
 
-    try {
-        if ($validator->fails()) {
-            return response()->json(['error' => $validator->errors()], 422);
-        }
-
-       $stylePost= new StylePost();
-
-       if ($request->desc){
-            $stylePost->description = $request->desc;
-        }
-
-        if ($request->tag) {
-            foreach ($request->tag as $tags){
-                $stylePost->tags =  $tags;
+        try {
+            if ($validator->fails()) {
+                return response()->json(['error' => $validator->errors()], 422);
             }
-        }
 
-        if ($request->brand_name) {
-            $stylePost->brand_name = $request->brand_name;
-        }
+            $stylePost= new StylePost();
 
-        if ($request->style_name) {
-            $stylePost->style_name = $request->style_name;
-        }
+            if ($request->desc){
+                $stylePost->description = $request->desc;
+            }
 
-        if ($request->color) {
-            $stylePost->color = $request->color;
-        }
+            if ($request->tag) {
+                foreach ($request->tag as $tags) {
+                    $stylePost->tags =  $tags;
+                }
+            }
 
-        if ($request->hasFile('images')) {
-            $data             = $this->uploadPostImage($request->images ,Auth::id());
-            $stylePost->media = json_encode($data); 
-       }
-        // this might be needed for future 
-        // if ($request->hasFile('clip')) {
-        //     $data             = $this->uploadClip($request->clip ,Auth::id());
-        //     $stylePost->media = json_encode($data);  
-        // }
+            if ($request->brand_name) {
+                $stylePost->brand_name = $request->brand_name;
+            }
 
-        $stylist = User::find(Auth::id())->stylist;
-        $stylePost->stylist_id = $stylist->id;
-        $stylePost->save();
+            if ($request->style_name) {
+                $stylePost->style_name = $request->style_name;
+            }
+
+            if ($request->color) {
+                $stylePost->color = $request->color;
+            }
+
+            if ($request->hasFile('images')) {
+                $data             = $this->uploadPostImage($request->images ,Auth::id());
+                $stylePost->media = json_encode($data); 
+            }
+            // this might be needed for future 
+            // if ($request->hasFile('clip')) {
+            //     $data             = $this->uploadClip($request->clip ,Auth::id());
+            //     $stylePost->media = json_encode($data);  
+            // }
+
+            $stylist = User::find(Auth::id())->stylist;
+            $stylePost->stylist_id = $stylist->id;
+            $stylePost->save();
 
             return response()->json(
                 ['success' => $stylePost ,
-                'message' => 'images updated successfully'] ,
+                'message' => 'post updated successfully'] ,
                 200);
         } catch (Exception $e) {
             return response()->json(['error' => 'something went wrong!'], 500);
         }
-   
     }
 
     private function uploadPostImage($image , $id)
@@ -157,7 +152,6 @@ class StylePostController extends Controller
             $file->move(public_path().'/uploads/style_post/'. $id ,$name);
             $data[] = $name; 
         }
-
         return $data;
     }
 
@@ -256,7 +250,6 @@ class StylePostController extends Controller
      * 
      * )
      */
-    
     public function showPost($id)
     {
         try {
@@ -306,7 +299,6 @@ class StylePostController extends Controller
      *         required=false,
      *         type="string",
      *     ),
-     * 
      *     @SWG\Parameter(
      *         name="style_name",
      *         in="path",
@@ -342,7 +334,7 @@ class StylePostController extends Controller
     {
         $validator =  Validator::make(
             $request->all() ,[
-            'images'     => 'required|max:10',
+            'images'     => 'required',
             'images.*'   => 'mimes:jpg,jpeg,gif,png',
             'desc'       => 'max:2000',
             'tag'        => '',
@@ -358,9 +350,8 @@ class StylePostController extends Controller
 
             $stylePost = StylePost::findOrfail($id);
             
-           
-           if ($request->desc){
-            $stylePost->description = $request->desc;
+            if ($request->desc) {
+                $stylePost->description = $request->desc;
             }
     
             if ($request->tag) {
@@ -370,15 +361,15 @@ class StylePostController extends Controller
             }
     
             if ($request->brand_name) {
-            $stylePost->brand_name = $request->brand_name;
+                $stylePost->brand_name = $request->brand_name;
             }
     
             if ($request->style_name) {
-            $stylePost->style_name = $request->style_name;
+                $stylePost->style_name = $request->style_name;
             }
     
             if ($request->color) {
-            $stylePost->color = $request->color;
+                $stylePost->color = $request->color;
             }
 
             $images = json_decode($stylePost->media);
@@ -388,14 +379,14 @@ class StylePostController extends Controller
                 $data             = $this->uploadPostImage(
                                     $request->images ,Auth::id());
                 $stylePost->media = json_encode($data); 
-           }
+            }
 
             $stylePost->save();    
 
-                return response()->json(
-                    ['success' => $stylePost ,
-                    'message' => 'images updated successfully'] ,
-                    200);
+            return response()->json(
+                ['success' => $stylePost ,
+                'message' => 'postt updated successfully'] ,
+                200);
 
          }catch (Exception $e) {
              return response()->json(['error' => 'something went wrong!'], 500);
@@ -406,7 +397,7 @@ class StylePostController extends Controller
     private function deletePostImages($images ,$userId)
     {
        try{
-           foreach ($images as $key => $value){
+           foreach ($images as $key => $value) {
                $path = public_path().'/uploads/style_post/'. $userId.'/'. $value;
                File::delete($path);
            }

@@ -13,10 +13,6 @@ use Illuminate\Http\Request;
 |
 */
 
-
-
-
-
 // for user
 
     Route::post('register', 'User\AuthController@register');
@@ -49,19 +45,5 @@ use Illuminate\Http\Request;
     Route::get('show_all_post', 'Stylist\StylePostController@showAllPosts');
     Route::get('show_post/{id}', 'Stylist\StylePostController@showPost');
     Route::post('update_post/{id}', 'Stylist\StylePostController@updateStylePost');
-
     });
-
-
-//for user profile
-Route::group(['prefix' => 'profile'], function (){
-    Route::get('show', 'User\UserProfileController@show');
-    Route::post('update', 'User\UserProfileController@update');
-});
-
-Route::group(['middleware' => 'auth:api'], function(){
-
-
-});
-
     });

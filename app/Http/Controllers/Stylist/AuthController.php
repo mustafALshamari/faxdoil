@@ -13,7 +13,6 @@ use Validator;
 class AuthController extends Controller
 {
     public $successStatus = 200;
-  
      /**
      * @SWG\Post(
      *     path="/api/stylist/register",
@@ -50,7 +49,6 @@ class AuthController extends Controller
      *         response="401",
      *         description="validation error",
      *     ),
-     * 
      * )
      */
     public function register(Request $request) 
@@ -60,23 +58,21 @@ class AuthController extends Controller
             'username'   => 'required|unique:users', 
             'email'      => 'required|unique:users',
             'password'   => 'required', 
-    
         ]);
 
         if ($validator->fails()) { 
             return response()->json(['error'=>$validator->errors()], 401);            
         }
 
-        $input              = $request->all(); 
-        $input['password']  = bcrypt($input['password']); 
-        $user               = User::create($input); 
-        $thisUser           = User::findOrfail($user->id);
-        $stylist            = Stylist::create(['user_id'=> $thisUser->id]);
-        $success['message'] =  'You have successfully been registered';
-        $success['token']   =  $user->createToken('kaiApp')->accessToken; 
-        $success['username']    =  $user->username;
+        $input               = $request->all(); 
+        $input['password']   = bcrypt($input['password']); 
+        $user                = User::create($input); 
+        $thisUser            = User::findOrfail($user->id);
+        $stylist             = Stylist::create(['user_id'=> $thisUser->id]);
+        $success['message']  = 'You have successfully been registered';
+        $success['token']    = $user->createToken('kaiApp')->accessToken; 
+        $success['username'] = $user->username;
         
             return response()->json(['success'=>$success], $this->successStatus); 
     }
-    
 }
