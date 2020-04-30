@@ -19,9 +19,9 @@
                 "description": "register new stylist",
                 "parameters": [
                     {
-                        "name": "name",
+                        "name": "username",
                         "in": "path",
-                        "description": "user's name",
+                        "description": "username",
                         "required": true,
                         "type": "string"
                     },
@@ -59,7 +59,7 @@
                     "Salon"
                 ],
                 "summary": "create salon",
-                "description": "create new salon",
+                "description": "create salon and if exist , then you can update it using this API",
                 "parameters": [
                     {
                         "name": "name",
@@ -67,14 +67,39 @@
                         "description": "salon's name",
                         "required": true,
                         "type": "string"
+                    },
+                    {
+                        "name": "location",
+                        "in": "path",
+                        "description": "location",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "latitude",
+                        "in": "path",
+                        "description": "latitude",
+                        "required": false,
+                        "type": "number"
+                    },
+                    {
+                        "name": "longitude",
+                        "in": "path",
+                        "description": "longitude",
+                        "required": false,
+                        "type": "number"
+                    },
+                    {
+                        "name": "images[]",
+                        "in": "path",
+                        "description": "images max 10 pieces",
+                        "required": false,
+                        "type": "string"
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "successful operation message with user Token and user name"
-                    },
-                    "409": {
-                        "description": "message already exist salon"
+                        "description": "successful operation message "
                     },
                     "422": {
                         "description": "validation error"
@@ -90,34 +115,384 @@
                 ]
             }
         },
-        "/api/stylist/update_salon": {
+        "/api/stylist/show_my_salon": {
+            "get": {
+                "tags": [
+                    "Salon"
+                ],
+                "summary": "show salon info",
+                "description": "get salon info like name,images ,address for owner 'stylist'",
+                "responses": {
+                    "200": {
+                        "description": "salon full info and images",
+                        "schema": {
+                            "$ref": "#/definitions/Salon"
+                        }
+                    },
+                    "500": {
+                        "description": "error something went wrong"
+                    }
+                },
+                "security": [
+                    {
+                        "passport": []
+                    }
+                ]
+            }
+        },
+        "/api/stylist/update_location": {
             "post": {
                 "tags": [
                     "Salon"
                 ],
-                "summary": "update salon",
-                "description": "update salon info",
+                "summary": "update salon's location",
+                "description": "update salon location for salon owner 'stylist'",
                 "parameters": [
                     {
-                        "name": "name",
+                        "name": "location",
                         "in": "path",
-                        "description": "salon's name",
-                        "required": true,
-                        "type": "string"
-                    },
-                    {
-                        "name": "address",
-                        "in": "path",
-                        "description": "salon's address",
+                        "description": "location will be updated by loation object that consist ,address, latitude,longitude ",
                         "required": false,
                         "type": "string"
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "successful operation message with user Token and user name",
+                        "description": "location update",
                         "schema": {
                             "$ref": "#/definitions/Salon"
+                        }
+                    },
+                    "500": {
+                        "description": "error something went wrong"
+                    }
+                },
+                "security": [
+                    {
+                        "passport": []
+                    }
+                ]
+            }
+        },
+        "/api/stylist/show_my_location": {
+            "get": {
+                "tags": [
+                    "Salon"
+                ],
+                "summary": "show salon's location",
+                "description": "get salon location for salon owner 'stylist'",
+                "responses": {
+                    "200": {
+                        "description": "return location and iside lat and long",
+                        "schema": {
+                            "$ref": "#/definitions/Salon"
+                        }
+                    },
+                    "500": {
+                        "description": "error something went wrong"
+                    }
+                },
+                "security": [
+                    {
+                        "passport": []
+                    }
+                ]
+            }
+        },
+        "/api/stylist/add_service": {
+            "post": {
+                "tags": [
+                    "Salon"
+                ],
+                "summary": "add service to salon",
+                "description": "add services",
+                "parameters": [
+                    {
+                        "name": "name",
+                        "in": "path",
+                        "description": "name",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "price",
+                        "in": "path",
+                        "description": "price",
+                        "required": false,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "service added successfuly",
+                        "schema": {
+                            "$ref": "#/definitions/Services"
+                        }
+                    },
+                    "422": {
+                        "description": "validation error"
+                    },
+                    "500": {
+                        "description": "error something went wrong"
+                    }
+                },
+                "security": [
+                    {
+                        "passport": []
+                    }
+                ]
+            }
+        },
+        "/api/stylist/my_service": {
+            "get": {
+                "tags": [
+                    "Salon"
+                ],
+                "summary": "show salon's services for stylis 'for self'",
+                "description": "get salon services'",
+                "responses": {
+                    "200": {
+                        "description": "return all salon service",
+                        "schema": {
+                            "$ref": "#/definitions/Services"
+                        }
+                    },
+                    "500": {
+                        "description": "error something went wrong"
+                    }
+                },
+                "security": [
+                    {
+                        "passport": []
+                    }
+                ]
+            }
+        },
+        "/api/stylist/delete_service/{id}": {
+            "get": {
+                "tags": [
+                    "Salon"
+                ],
+                "summary": "delete specifc service",
+                "description": "delete sservice",
+                "responses": {
+                    "200": {
+                        "description": "service deleted",
+                        "schema": {
+                            "$ref": "#/definitions/Services"
+                        }
+                    },
+                    "500": {
+                        "description": "error something went wrong"
+                    }
+                },
+                "security": [
+                    {
+                        "passport": []
+                    }
+                ]
+            }
+        },
+        "/api/stylist/make_style_post": {
+            "post": {
+                "tags": [
+                    "StylePost"
+                ],
+                "summary": "create style post",
+                "description": "create new style post",
+                "parameters": [
+                    {
+                        "name": "desc",
+                        "in": "path",
+                        "description": "post's description",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "tag",
+                        "in": "path",
+                        "description": "tags",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "images[]",
+                        "in": "path",
+                        "description": "images max 10 pieces",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "brand name",
+                        "in": "path",
+                        "description": "brand name",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "style_name",
+                        "in": "path",
+                        "description": "style name",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "color",
+                        "in": "path",
+                        "description": "color",
+                        "required": false,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation message ",
+                        "schema": {
+                            "$ref": "#/definitions/StylePost"
+                        }
+                    },
+                    "422": {
+                        "description": "validation error"
+                    },
+                    "500": {
+                        "description": "error something went wrong"
+                    }
+                },
+                "security": [
+                    {
+                        "passport": []
+                    }
+                ]
+            }
+        },
+        "/api/stylist/delete_post/{id}": {
+            "get": {
+                "tags": [
+                    "StylePost"
+                ],
+                "summary": "delete some post by stylist",
+                "description": "delete style post'",
+                "responses": {
+                    "200": {
+                        "description": "Post has been deleted'"
+                    },
+                    "500": {
+                        "description": "error something went wrong"
+                    }
+                },
+                "security": [
+                    {
+                        "passport": []
+                    }
+                ]
+            }
+        },
+        "/api/stylist/show_all_post": {
+            "get": {
+                "tags": [
+                    "StylePost"
+                ],
+                "summary": "show all post for stylist",
+                "description": "delete some style post'",
+                "responses": {
+                    "200": {
+                        "description": "show all post for stylist",
+                        "schema": {
+                            "$ref": "#/definitions/StylePost"
+                        }
+                    },
+                    "500": {
+                        "description": "error something went wrong"
+                    }
+                },
+                "security": [
+                    {
+                        "passport": []
+                    }
+                ]
+            }
+        },
+        "/api/stylist/show_post/{id}'": {
+            "get": {
+                "tags": [
+                    "StylePost"
+                ],
+                "summary": "show specific post for stylist",
+                "description": "show some style post'",
+                "responses": {
+                    "200": {
+                        "description": "show specific post for stylist",
+                        "schema": {
+                            "$ref": "#/definitions/StylePost"
+                        }
+                    },
+                    "500": {
+                        "description": "error something went wrong"
+                    }
+                },
+                "security": [
+                    {
+                        "passport": []
+                    }
+                ]
+            }
+        },
+        "/api/stylist/update_post/{id}'": {
+            "post": {
+                "tags": [
+                    "StylePost"
+                ],
+                "summary": "update style post",
+                "description": "update style post",
+                "parameters": [
+                    {
+                        "name": "desc",
+                        "in": "path",
+                        "description": "post's description",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "tag",
+                        "in": "path",
+                        "description": "tags",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "images[]",
+                        "in": "path",
+                        "description": "images max 10 pieces",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "brand name",
+                        "in": "path",
+                        "description": "brand name",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "style_name",
+                        "in": "path",
+                        "description": "style name",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "color",
+                        "in": "path",
+                        "description": "color",
+                        "required": false,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "schema": {
+                            "$ref": "#/definitions/StylePost"
                         }
                     },
                     "422": {
@@ -179,9 +554,9 @@
                 "description": "register new user",
                 "parameters": [
                     {
-                        "name": "name",
+                        "name": "username",
                         "in": "path",
-                        "description": "user's name",
+                        "description": "username",
                         "required": true,
                         "type": "string"
                     },
@@ -311,6 +686,41 @@
                 },
                 "longitude": {
                     "type": "double"
+                }
+            }
+        },
+        "Services": {
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "price": {
+                    "type": "string"
+                }
+            }
+        },
+        "StylePost": {
+            "properties": {
+                "stylist_id": {
+                    "type": "integer"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "media": {
+                    "type": "text"
+                },
+                "brand_name": {
+                    "type": "string"
+                },
+                "style_name": {
+                    "type": "string"
+                },
+                "tags": {
+                    "type": "string"
+                },
+                "color": {
+                    "type": "string"
                 }
             }
         },

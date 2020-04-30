@@ -21,9 +21,9 @@ class AuthController extends Controller
      *     tags={"Auth"},
      *     description="register new stylist",
      *     @SWG\Parameter(
-     *         name="name",
+     *         name="username",
      *         in="path",
-     *         description="user's name",
+     *         description="username",
      *         required=true,
      *         type="string",
      *     ),
@@ -55,27 +55,28 @@ class AuthController extends Controller
      */
     public function register(Request $request) 
     { 
-        $validator = Validator::make($request->all(), [ 
-            'name' => 'required', 
-            'email' => 'required|email', 
-            'password' => 'required', 
+        $validator = Validator::make(
+            $request->all(), [ 
+            'username'   => 'required|unique:users', 
+            'email'      => 'required|unique:users',
+            'password'   => 'required', 
     
         ]);
+
         if ($validator->fails()) { 
             return response()->json(['error'=>$validator->errors()], 401);            
         }
-        $input = $request->all(); 
-        $input['password'] = bcrypt($input['password']); 
-        $user = User::create($input); 
 
-        $thisUser = User::findOrfail($user->id);
-        $stylist = Stylist::create(['user_id'=> $thisUser->id]);
-
+        $input              = $request->all(); 
+        $input['password']  = bcrypt($input['password']); 
+        $user               = User::create($input); 
+        $thisUser           = User::findOrfail($user->id);
+        $stylist            = Stylist::create(['user_id'=> $thisUser->id]);
         $success['message'] =  'You have successfully been registered';
-        $success['token'] =  $user->createToken('kaiApp')->accessToken; 
-        $success['name'] =  $user->name;
+        $success['token']   =  $user->createToken('kaiApp')->accessToken; 
+        $success['username']    =  $user->username;
         
-        return response()->json(['success'=>$success], $this->successStatus); 
+            return response()->json(['success'=>$success], $this->successStatus); 
     }
     
 }

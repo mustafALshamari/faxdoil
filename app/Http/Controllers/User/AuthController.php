@@ -45,14 +45,15 @@ class AuthController extends Controller
      *     )
      * )
      */
-    public function login(Request $request){
+    public function login(Request $request)
+    {
+            if ( Auth::attempt(['email' => $request->email, 'password' => $request->password]) ) {
 
-
-            if(Auth::attempt(['email' => $request->email, 'password' => $request->password])){
                 $user = Auth::user();
                 $success['token'] =  $user->createToken('MyApp')->accessToken;
-                $success['name']    =  $user->name;
-                return response()->json(['success' => $success], $this->successStatus);
+                $success['username']    =  $user->username;
+
+                    return response()->json(['success' => $success], $this->successStatus);
 
             }
             else{
@@ -68,9 +69,9 @@ class AuthController extends Controller
      *     tags={"Auth"},
      *     description="register new user",
      *     @SWG\Parameter(
-     *         name="name",
+     *         name="username",
      *         in="path",
-     *         description="user's name",
+     *         description="username",
      *         required=true,
      *         type="string",
      *     ),
@@ -102,22 +103,25 @@ class AuthController extends Controller
      */
     public function register(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'name'       => 'required',
-            'email'      => 'required|email',
-            'password'   => 'required',
+        $validator = Validator::make(
+            $request->all(), [
+            'username'       => 'required|unique:users',
+            'email'          => 'required|unique:users',
+            'password'       => 'required',
 
         ]);
+
         if ($validator->fails()) {
             return response()->json(['error'=>$validator->errors()], 422);
         }
+
         $input = $request->all();
         $input['password'] = bcrypt($input['password']);
         $user = User::create($input);
 
         $success['message'] =  'You have successfully been registered';
         $success['token']   =  $user->createToken('kaiApp')->accessToken;
-        $success['name']    =  $user->name;
+        $success['username']    =  $user->username;
 
         return response()->json(['success'=>$success], $this->successStatus);
     }
@@ -137,16 +141,15 @@ class AuthController extends Controller
      * )
      */
 
-    public function logout() {
+    public function logout()
+    {
         $accessToken = Auth::user()->token();
         DB::table('oauth_refresh_tokens')
             ->where('access_token_id', $accessToken->id)
             ->update([
                 'revoked' => true
             ]);
-
         $accessToken->revoke();
-        return response()->json(['logout'=>'See you soon!'] ,  $this->successStatus);
+            return response()->json(['logout'=>'See you soon!'] ,  $this->successStatus);
     }
-
-    }
+}
