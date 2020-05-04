@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\User; 
+use App\User;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth; 
+use Illuminate\Support\Facades\Auth;
 use Validator;
 
 /**
@@ -15,7 +15,7 @@ use Validator;
 class AuthController extends Controller
 {
     public $successStatus = 200;
-    
+
     /**
      * Register api
      *
@@ -24,10 +24,9 @@ class AuthController extends Controller
     public function register(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'name'     => 'required',
-            'email'    => 'required|email',
-            'password' => 'required',
-
+            'username'       => 'required|unique:users',
+            'email'          => 'required|unique:users',
+            'password'       => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -35,12 +34,16 @@ class AuthController extends Controller
         }
 
         $input = $request->all();
+        $input['email']     = strtolower($input['email']);
+        $input['password']  = bcrypt($input['password']);
+        $input['user_type'] = 'admin';
 
-        $input['password'] = bcrypt($input['password']);
-        $user              = User::create($input);
-        $success['token']  = $user->createToken('kaiApp')->accessToken;
-        $success['name']   = $user->name;
+        $user                 = User::create($input);
 
-        return response()->json([ 'success'=> $success ], $this->successStatus);
+        $success['token']     = $user->createToken('kaiApp')->accessToken;
+        $success['username']  = $user->username;
+        $success['user_type'] = $user->user_type;
+
+        return response()->json(['success'=>$success], $this->successStatus);
     }
 }

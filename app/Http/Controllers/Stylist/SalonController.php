@@ -3,44 +3,25 @@
 namespace App\Http\Controllers\Stylist;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\User;
 use App\Salon;
+use App\Stylist;
+use App\Services;
 use Validator;
 use Exception;
 use DB;
 use Auth;
+use File;
 
-/**
- * Class SalonController
- * @package App\Http\Controllers\Stylist
- */
 class SalonController extends Controller
 {
-    /**
-     * @param User $user
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function index(User $user)
-    {
-        $id = Auth::id();
-
-        $selectAllInfoForStylist = DB::table('users')
-            ->join('stylists', 'stylists.user_id', '=', 'users.id')
-            ->where('stylists.user_id', $id)
-            ->get();
-
-        return response()->json($selectAllInfoForStylist);
-     }
-
-
     /**
      * @SWG\Post(
      *     path="/api/stylist/add_salon",
      *     summary="create salon",
      *     tags={"Salon"},
-     *     description="create new salon",
+     *     description="create salon and if exist , then you can update it using this API",
      *     security={{"passport": {}}},
      *     @SWG\Parameter(
      *         name="name",
@@ -50,19 +31,36 @@ class SalonController extends Controller
      *         type="string",
      *     ),
      *     @SWG\Parameter(
-     *         name="name",
+     *         name="location",
      *         in="path",
-     *         description="salon's name",
-     *         required=true,
+     *         description="location",
+     *         required=false,
+     *         type="string",
+     *     ),
+     *      @SWG\Parameter(
+     *         name="latitude",
+     *         in="path",
+     *         description="latitude",
+     *         required=false,
+     *         type="number",
+     *     ),
+     *     @SWG\Parameter(
+     *         name="longitude",
+     *         in="path",
+     *         description="longitude",
+     *         required=false,
+     *         type="number",
+     *     ),
+     *      @SWG\Parameter(
+     *         name="images[]",
+     *         in="path",
+     *         description="images max 10 pieces",
+     *         required=false,
      *         type="string",
      *     ),
      *     @SWG\Response(
      *         response=200,
-     *         description="successful operation message with user Token and user name",
-     *     ),
-     *     @SWG\Response(
-     *         response="409",
-     *         description="message already exist salon",
+     *         description="successful operation message ",   
      *     ),
      *     @SWG\Response(
      *         response="422",
@@ -72,34 +70,58 @@ class SalonController extends Controller
      *         response="500",
      *         description="error something went wrong",
      *     ),
-     *
      * )
      */
-    public function createSalon(Request $request)
+    public function addSalon(Request $request)
     {
-       $validator = Validator::make($request->all() ,[
-           'name' => 'required'
-       ]);
+       $validator =  Validator::make(
+           $request->all() ,[
+            'name'      => 'required',
+            'location'  => '',
+            'images.*'  => 'mimes:jpg,jpeg,gif,png',
+        ]);
 
         try {
-            $stylist = $this->findStylistById(Auth::id());
-            $hasSalon = $stylist->salon_id;
+            if ($validator->fails()) {
+                return response()->json(['error' => $validator->errors()], 422);
+            }
 
-            if (!$hasSalon) {
-                if ($validator->fails()) {
-                    return response()->json(['error' => $validator->errors()],422);
+            $stylist = $this->findStylistById(Auth::id());
+            $salon = Salon::find($stylist->salon_id);
+
+            if ($salon) {
+                $this->updateSalon($salon , $request);
+            } else {
+                $salon = new Salon();
+                
+                if ($request->name) {
+                    $salon->name = $request->name;
                 }
 
-                $makeSalon         = Salon::create(['name' => $request->name]);
-                $stylist           = $this->findStylistById(Auth::id());
-                $stylist->salon_id = $makeSalon->id;
+                if ($request->location) {
+                    foreach ($request->location as $key => $value) {
+                        $salon->address   = $value['address'];
+                        $salon->latitude  = $value['latitude'];
+                        $salon->longitude = $value['longitude'];
+                    }
+                }
 
-                $stylist->save();
-
-                return response()->json(['success','successfully created your salon'],200);
-            } else {
-                return response()->json(['message' => 'You have already exist Salon'],409);
+                if ($request->hasFile('images')) {
+                    foreach ($request->file('images') as $file) {
+                        $name = time().'.'.$file->getClientOriginalName();
+                        $file->move(public_path().'/uploads/salon/'. Auth::id() , $name);
+                        $data[] = $name; 
+                    }
+                    $salon->images = json_encode($data);
+                }
             }
+
+            $salon->save();
+            $stylist           = $this->findStylistById(Auth::id());
+            $stylist->salon_id = $salon->id;
+            $stylist->save();
+
+            return response()->json(['success','successfully created your salon'], 200);
         } catch (Exception $e) {
             return response()->json(['error' => 'something went wrong!'], 500);
         }
@@ -108,185 +130,300 @@ class SalonController extends Controller
     /**
      * return data form stylist
      * table by using stylist id
-     * @return array
+     * @return array  
      */
     public function findStylistById($id)
     {
         return User::find($id)->stylist;
     }
 
-     /**
-     * @SWG\Post(
-     *     path="/api/stylist/update_salon",
-     *     summary="update salon",
-     *     tags={"Salon"},
-     *     description="update salon info",
-     *     security={{"passport": {}}},
-     *     @SWG\Parameter(
-     *         name="name",
-     *         in="path",
-     *         description="salon's name",
-     *         required=true,
-     *         type="string",
-     *     ),
-     *     @SWG\Parameter(
-     *         name="address",
-     *         in="path",
-     *         description="salon's address",
-     *         required=false,
-     *         type="string",
-     *     ),
-     *     @SWG\Response(
-     *         response=200,
-     *         description="successful operation message with user Token and user name",
-     *         @SWG\Schema(ref="#/definitions/Salon"),
-     *     ),
-     *     @SWG\Response(
-     *         response="422",
-     *         description="validation error",
-     *     ),
-     *     @SWG\Response(
-     *         response="500",
-     *         description="error something went wrong",
-     *     ),
-     *
-     * )
-     */
-    public function updateSalonInfo(Request $request)
-    {
-        $validator =  Validator::make($request->all() ,[
-            'name' => 'required',
-            'address' => ''
-        ]);
-
+    public function updateSalon($salon ,$request)
+    {   
         try {
-            if ($validator->fails()) {
-                return response()->json(['error' => $validator->errors()],422);
-            }
-
-            $stylist = $this->findStylistById(Auth::id());
-            $salon   = Salon::find($stylist->salon_id);
-
             if ($request->name) {
                 $salon->name = $request->name;
             }
 
-            if ($request->address) {
-                $salon->address = $request->address;
+            if ($request->location) {
+                foreach ($request->location as $key => $value){
+                    $salon->address    = $value['address'];
+                    $salon->latitude   = $value['latitude'];
+                    $salon->longitude  = $value['longitude'];
+                }
             }
 
-            $salon->save();
+            if ($request->hasFile('images')) {
+                $this->deleteSalonImages(Auth::id());
+                foreach ($request->file('images') as $file) {
+                    $name = time().'.'.$file->getClientOriginalName();
+                    $file->move(public_path().'/uploads/salon/'.Auth::id(), $name);
+                    $data[] = $name;
+                }
+                $salon->images = json_encode($data);
+            }
 
-            return response()->json(['success','successfully updated your info'],200);
+            return response()->json(['success' => 'successfully updated your salon'],200);
         } catch (Exception $e) {
             return response()->json(['error' => 'something went wrong!'], 500);
         }
     }
 
     /**
-     *  Salon owner updating his own images
-     * for salon
-     *
-     * @param  \Illuminate\Http\Request  $request
-     *
-     * @return \Illuminate\Http\Response
+     * @SWG\Get(
+     *     path="/api/stylist/show_my_salon",
+     *     summary="show salon info",
+     *     tags={"Salon"},
+     *     description="get salon info like name,images ,address for owner 'stylist'",
+     *     security={{"passport": {}}},
+     *     @SWG\Response(
+     *         response=200,
+     *         description="salon full info and images",
+     *         @SWG\Schema(ref="#/definitions/Salon"),
+     *     ),
+     *     @SWG\Response(
+     *         response="500",
+     *         description="error something went wrong",
+     *     ),
+     * 
+     * )
      */
-
-    public function updateImages(Request $request)
+    public function showMySalon()
     {
-        $validator =  Validator::make($request->all() ,[
-            'images' => ''
-        ]);
-
-        try {
-            if ($validator->fails()) {
-                return response()->json(['error' => $validator->errors()],401);
-            }
-
-            if ($request->hasFile('images')) {
-                foreach ($request->file('images') as $file) {
-                    $name          = time().'.'.$file->getClientOriginalName();
-                    $thumbnailpath = $file->move(public_path().'/uploads/salon/', $name);
-                    $data[]        = $name;
-                }
-
-                $stylist       = $this->findStylistById(Auth::id());
-                $salon         = Salon::find($stylist->salon_id);
-                $salon->images = json_encode($data);
-
-                $salon->save();
-
-                return response()->json(['success','images uploaded successfully'],200);
-            }
-         } catch (Exception $e) {
-             return response()->json(['error' => 'something went wrong!'], 500);
+        try{
+            $salonOwner = $this->findStylistById(Auth::id());
+            $mySalon    = Salon::find($salonOwner)->first();
+            
+            return response()->json(['salon' => $mySalon], 200);
+        } catch (Exception $e) {
+            return response()->json(['error' => 'something went wrong!'], 500);
         }
     }
 
     /**
-     * Salon owner updates location
-     *
-     * @param Request $request
-     *
-     * @return \Illuminate\Http\JsonResponse
-     * @throws \Illuminate\Validation\ValidationException
+     * @SWG\Post(
+     *     path="/api/stylist/update_location",
+     *     summary="update salon's location",
+     *     tags={"Salon"},
+     *     description="update salon location for salon owner 'stylist'",
+     *     security={{"passport": {}}},
+     *     @SWG\Parameter(
+     *         name="location",
+     *         in="path",
+     *         description="location will be updated by loation object that consist ,address, latitude,longitude ",
+     *         required=false,
+     *         type="string",
+     *     ),
+     *     @SWG\Response(
+     *         response=200,
+     *         description="location update",
+     *         @SWG\Schema(ref="#/definitions/Salon"),
+     *     ),
+     *     @SWG\Response(
+     *         response="500",
+     *         description="error something went wrong",
+     *     ),
+     * 
+     * )
      */
     public function updateLocation(Request $request)
     {
         $this->validate($request, [
-            'latitude'  => 'required|numeric',
-            'longitude' => 'required|numeric'
-        ]);
+                'location' => ''
+            ]);
 
         $stylist = $this->findStylistById(Auth::id());
 
         if ($salon = Salon::find($stylist->salon_id)) {
 
-            $salon->latitude = $request->latitude;
-            $salon->longitude = $request->longitude;
-            $salon->save();
+            if ($request->location) {
+                foreach ($request->location as $key => $value){
+                    $salon->address   = $value['address'];
+                    $salon->latitude  = $value['latitude'];
+                    $salon->longitude = $value['longitude'];
+               }
+            }
 
-            return response()->json(['message' => 'location updated successfully'], 200);
+            return response()->json(['message' => 'location updated successfuly'], 200);
         } else {
             return response()->json(['error' => 'something went wrong!'], 500);
         }
     }
 
     /**
-     * Salon owner updates location
-     *
-     * @return JsonResponse
+     * @SWG\Get(
+     *     path="/api/stylist/show_my_location",
+     *     summary="show salon's location",
+     *     tags={"Salon"},
+     *     description="get salon location for salon owner 'stylist'",
+     *     security={{"passport": {}}},
+     *     @SWG\Response(
+     *         response=200,
+     *         description="return location and iside lat and long",
+     *         @SWG\Schema(ref="#/definitions/Salon"),
+     *     ),
+     *     @SWG\Response(
+     *         response="500",
+     *         description="error something went wrong",
+     *     ),
+     * 
+     * )
      */
-    public function showMySalon()
+    public function showMyLocation()
     {
-       try {
-           $salonOwner = $this->findStylistById(Auth::id());
-           $mySalon = Salon::find($salonOwner)->first();
+        try{
+            $salonOwner = $this->findStylistById(Auth::id());
+            $mySalon = Salon::find($salonOwner)->first();
+            
+            return response()->json(
+                ['location' => [
+                    'address'  => $mySalon->address ,
+                    'latitude' => $mySalon->latitude ,
+                    'longitude' => $mySalon->longitude
+                    ] ], 200);
+        } catch (Exception $e) { 
+            return response()->json(['error' => 'something went wrong!'], 500);
+        }
+     }
 
-           return response()->json(['salon' => $mySalon], 200);
+     /**
+     * @SWG\Post(
+     *     path="/api/stylist/add_service",
+     *     summary="add service to salon",
+     *     tags={"Salon"},
+     *     description="add services",
+     *     security={{"passport": {}}},
+     *     @SWG\Parameter(
+     *         name="name",
+     *         in="path",
+     *         description="name",
+     *         required=true,
+     *         type="string",
+     *     ),
+     *     @SWG\Parameter(
+     *         name="price",
+     *         in="path",
+     *         description="price",
+     *         required=false,
+     *         type="integer",
+     *     ),
+     *     @SWG\Response(
+     *         response=200,
+     *         description="service added successfuly",
+     *         @SWG\Schema(ref="#/definitions/Services"),
+     *     ),
+     *   @SWG\Response(
+     *         response=422,
+     *         description="validation error",
+     *        
+     *     ),
+     *     @SWG\Response(
+     *         response="500",
+     *         description="error something went wrong",
+     *     ),
+     * 
+     * )
+     */
+     public function addService(Request $request)
+     {
+        $validator =  Validator::make(
+            $request->all() ,[
+             'name'      => 'required',
+             'price'     => 'numeric'
+         ]);
+
+        try{
+            if ($validator->fails()) {
+                return response()->json(['error' => $validator->errors()], 422);
+            }
+
+            $salonOwner = $this->findStylistById(Auth::id());
+
+            $service            = new Services();
+            $service->name      = $request->name;
+            $service->price     = $request->price;
+            $service->salon_id  = $salonOwner->salon_id;
+
+            $service->save();
+
+            return response()->json(['message' => 'service added successfuly'], 200);
+        } catch (Exception $e) {
+            return response()->json(['error' => 'something went wrong!'], 500);
+        }
+     }
+     
+    /**
+     * @SWG\Get(
+     *     path="/api/stylist/my_service",
+     *     summary="show salon's services for stylis 'for self'",
+     *     tags={"Salon"},
+     *     description="get salon services'",
+     *     security={{"passport": {}}},
+     *     @SWG\Response(
+     *         response=200,
+     *         description="return all salon service",
+     *         @SWG\Schema(ref="#/definitions/Services"),
+     *     ),
+     *     @SWG\Response(
+     *         response="500",
+     *         description="error something went wrong",
+     *     ),
+     * )
+     */
+     public function listServices()
+     {
+        try{
+            $salonOwner  = $this->findStylistById(Auth::id());
+            $allServices =  Salon::findOrfail($salonOwner->salon_id)->service;
+            
+            return response()->json( ['allServices' => $allServices ], 200);
+        } catch (Exception $e) {
+            return response()->json(['error' => 'something went wrong!'], 500);
+        }
+     }
+
+    /**
+     * @SWG\Get(
+     *     path="/api/stylist/delete_service/{id}",
+     *     summary="delete specifc service",
+     *     tags={"Salon"},
+     *     description="delete sservice",
+     *     security={{"passport": {}}},
+     *     @SWG\Response(
+     *         response=200,
+     *         description="service deleted",
+     *         @SWG\Schema(ref="#/definitions/Services"),
+     *     ),
+     *     @SWG\Response(
+     *         response="500",
+     *         description="error something went wrong",
+     *     ),
+     * 
+     * )
+     */
+    public function deleteService($id)
+    {
+       try{
+           $service = Services::findOrfail($id);
+           $service->delete();
+
+           return response()->json(['success' => 'service deleted'] , 200);
        } catch (Exception $e) {
            return response()->json(['error' => 'something went wrong!'], 500);
        }
     }
 
-     /**
-     * Salon owner updates location
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function showMyLocation()
-    {
-        try {
-            $salonOwner = $this->findStylistById(Auth::id());
-            $mySalon = Salon::find($salonOwner)->first();
+     public function deleteSalonImages($id)
+     {
+        try{
+           $stylist = $this->findStylistById(Auth::id());
+            $salon = Salon::find($stylist->salon_id);
+            $images = json_decode($salon->images);
 
-            return response()->json([
-                'location' =>
-                    [
-                        'latitude'  => $mySalon->latitude ,
-                        'longitude' => $mySalon->longitude
-                    ]
-                ], 200);
+            foreach ($images as $key => $value){
+                $path = public_path().'/uploads/salon/'. $id .'/'. $value;
+                File::delete($path);
+            }
+
         } catch (Exception $e) {
             return response()->json(['error' => 'something went wrong!'], 500);
         }
