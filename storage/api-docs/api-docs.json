@@ -4,7 +4,7 @@
         "title": "KAI API",
         "version": "1.0.0"
     },
-    "host": "https://api-kai-dev.newlinetechno.net/",
+    "host": "https://api-kai-dev.newlinetechno.net",
     "basePath": "/",
     "schemes": [
         "https"

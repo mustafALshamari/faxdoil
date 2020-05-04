@@ -9,7 +9,7 @@ use Illuminate\Routing\Controller as BaseController;
 /**
  * @SWG\Swagger(
  *   schemes={"https"},
- *   host="https://api-kai-dev.newlinetechno.net/",
+ *   host="https://api-kai-dev.newlinetechno.net",
  *   basePath="/",
  *   @SWG\Info(
  *     title="KAI API",
