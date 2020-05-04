@@ -4,8 +4,6 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Services extends Model
-{
 /**
  * @SWG\Definition(
  *  definition="Services",
@@ -19,6 +17,8 @@ class Services extends Model
  *  ),
  * )
  */
+class Services extends Model
+{
     protected $fillable = 
     [
         'name',
@@ -31,7 +31,3 @@ class Services extends Model
         return $this->belongsTo('App\Salon');
     }
 }
-
-
-
- 

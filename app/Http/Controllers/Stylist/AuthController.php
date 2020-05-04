@@ -68,12 +68,14 @@ class AuthController extends Controller
         $input              = $request->all();
         $input['email']     = strtolower($input['email']); 
         $input['password']  = bcrypt($input['password']);
+        $input['user_type'] = 'stylist';
 
         $user = User::create($input);
 
-        $success['message']  = 'You have successfully been registered';
-        $success['token']    = $user->createToken('kaiApp')->accessToken;
-        $success['username'] = $user->username;
+        $success['message']   = 'You have successfully been registered';
+        $success['token']     = $user->createToken('kaiApp')->accessToken;
+        $success['username']  = $user->username;
+        $success['user_type'] = $user->user_type;
 
         return response()->json(['success'=>$success], $this->successStatus);
     }

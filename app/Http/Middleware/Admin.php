@@ -19,6 +19,6 @@ class Admin
 
             return $next($request);
         }
-           response()->json(['not allowed'], 403);
+        return response()->json(['not allowed'], 403);
     }
 }

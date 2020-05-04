@@ -21,7 +21,7 @@ use Illuminate\Http\Request;
     Route::post('email/reset', 'User\AuthController@reset');
 
     Route::group(['middleware' => 'auth:api'], function () {
-    Route::post('logout','User\AuthController@logout');
+        Route::post('logout','User\AuthController@logout');
     });
 
 
@@ -29,29 +29,29 @@ use Illuminate\Http\Request;
     Route::group(['prefix'=>'stylist'], function () {
     Route::post('register', 'Stylist\AuthController@register');
 
-    Route::group(['middleware' => 'auth:api'], function () {
-    Route::get('profile','Stylist\SalonController@index');
-    Route::post('add_salon', 'Stylist\SalonController@addSalon');
-    Route::post('update_salon', 'Stylist\SalonController@updateSalonInfo');
-    Route::post('update_images', 'Stylist\SalonController@updateImages');
-    Route::post('update_location', 'Stylist\SalonController@updateLocation');
-    Route::get('show_my_salon', 'Stylist\SalonController@showMysalon');
-    Route::get('show_my_location', 'Stylist\SalonController@showMyLocation');
-    //services
-    Route::post('add_service', 'Stylist\SalonController@addService');
-    Route::get('my_services', 'Stylist\SalonController@listServices');
-    Route::get('delete_service/{id}', 'Stylist\SalonController@deleteService');
-    //postStyile 
-    Route::post('make_style_post', 'Stylist\StylePostController@createStylePost');
-    Route::get('delete_post/{id}', 'Stylist\StylePostController@deletePost');
-    Route::get('show_all_post', 'Stylist\StylePostController@showAllPosts');
-    Route::get('show_post/{id}', 'Stylist\StylePostController@showPost');
-    Route::post('update_post/{id}', 'Stylist\StylePostController@updateStylePost');
-    });
+        Route::group(['middleware' => 'auth:api'], function () {
+            Route::get('profile','Stylist\SalonController@index');
+            Route::post('add_salon', 'Stylist\SalonController@addSalon');
+            Route::post('update_salon', 'Stylist\SalonController@updateSalonInfo');
+            Route::post('update_images', 'Stylist\SalonController@updateImages');
+            Route::post('update_location', 'Stylist\SalonController@updateLocation');
+            Route::get('show_my_salon', 'Stylist\SalonController@showMysalon');
+            Route::get('show_my_location', 'Stylist\SalonController@showMyLocation');
+            //services
+            Route::post('add_service', 'Stylist\SalonController@addService');
+            Route::get('my_services', 'Stylist\SalonController@listServices');
+            Route::get('delete_service/{id}', 'Stylist\SalonController@deleteService');
+            //postStyile 
+            Route::post('make_style_post', 'Stylist\StylePostController@createStylePost');
+            Route::get('delete_post/{id}', 'Stylist\StylePostController@deletePost');
+            Route::get('show_all_post', 'Stylist\StylePostController@showAllPosts');
+            Route::get('show_post/{id}', 'Stylist\StylePostController@showPost');
+            Route::post('update_post/{id}', 'Stylist\StylePostController@updateStylePost');
+        });
     });
     
     //for admin
     Route::group(['prefix'=>'admin'], function () {
-    Route::post('register', 'Admin\AuthController@register');
+        Route::post('register', 'Admin\AuthController@register');
     });
 

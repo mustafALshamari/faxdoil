@@ -7,7 +7,6 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Passport\HasApiTokens;
 
-
 /**
  * @SWG\Definition(
  *  definition="User",
@@ -49,7 +48,6 @@ use Laravel\Passport\HasApiTokens;
  *  )
  * )
  */
-
 class User extends Authenticatable
 {
     use HasApiTokens, Notifiable;
@@ -69,7 +67,8 @@ class User extends Authenticatable
         'phone_number',
         'location',
         'introduction', 
-        'photo_name'
+        'photo_name',
+        'user_type'
     ];
 
     /**
@@ -94,5 +93,4 @@ class User extends Authenticatable
     {
         return $this->hasOne('App\Stylist');
     }
-
 }

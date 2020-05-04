@@ -4,9 +4,6 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class StylePost extends Model
-{
-
 /**
  * @SWG\Definition(
  *  definition="StylePost",
@@ -40,6 +37,8 @@ class StylePost extends Model
  *  ),
  * )
  */
+class StylePost extends Model
+{
     protected $fillable = 
     [
          'description',
