@@ -8,8 +8,8 @@ use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller as BaseController;
 /**
  * @SWG\Swagger(
- *   schemes={"http"},
- *   host="localhost:8000",
+ *   schemes={"https"},
+ *   host="https://api-kai-dev.newlinetechno.net",
  *   basePath="/",
  *   @SWG\Info(
  *     title="KAI API",

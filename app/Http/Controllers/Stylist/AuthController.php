@@ -2,18 +2,17 @@
 
 namespace App\Http\Controllers\Stylist;
 
-use App\User; 
+use App\User;
 use App\Stylist;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-
-use Illuminate\Support\Facades\Auth; 
+use Illuminate\Support\Facades\Auth;
 use Validator;
 
 class AuthController extends Controller
 {
     public $successStatus = 200;
-    
+
      /**
      * @SWG\Post(
      *     path="/api/stylist/register",
@@ -66,7 +65,7 @@ class AuthController extends Controller
         }
 
         $input              = $request->all();
-        $input['email']     = strtolower($input['email']); 
+        $input['email']     = strtolower($input['email']);
         $input['password']  = bcrypt($input['password']);
         $input['user_type'] = 'stylist';
 

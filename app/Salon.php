@@ -4,6 +4,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
+
 /**
  * @SWG\Definition(
  *  definition="Salon",
@@ -36,7 +37,7 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Salon extends Model
 {
-    protected $fillable = 
+    protected $fillable =
     [
         'name' ,
         'address',
@@ -44,7 +45,7 @@ class Salon extends Model
         'latitude',
         'longitude'
     ];
-    
+
     public function service()
     {
         return $this->hasMany('App\Services');

@@ -4,10 +4,10 @@
         "title": "KAI API",
         "version": "1.0.0"
     },
-    "host": "localhost:8000",
+    "host": "https://api-kai-dev.newlinetechno.net",
     "basePath": "/",
     "schemes": [
-        "http"
+        "https"
     ],
     "paths": {
         "/api/stylist/register": {
@@ -711,19 +711,10 @@
         "/api/profile/show": {
             "get": {
                 "tags": [
-                    "Profile"
+                    "User Profile"
                 ],
-                "summary": "Get blog post by id",
-                "description": "Get profile data",
-                "parameters": [
-                    {
-                        "name": "user_id",
-                        "in": "path",
-                        "description": "User id",
-                        "required": true,
-                        "type": "integer"
-                    }
-                ],
+                "summary": "Get user profile",
+                "description": "Get user profile",
                 "responses": {
                     "200": {
                         "description": "successful operation",
@@ -733,6 +724,9 @@
                     },
                     "401": {
                         "description": "Unauthorized user"
+                    },
+                    "500": {
+                        "description": "error something went wrong"
                     }
                 }
             }
@@ -740,17 +734,69 @@
         "/api/profile/update": {
             "post": {
                 "tags": [
-                    "Profile"
+                    "User Profile"
                 ],
                 "summary": "Update user profile",
                 "description": "Update profile data",
                 "parameters": [
                     {
-                        "name": "user_id",
+                        "name": "username",
                         "in": "path",
-                        "description": "User id",
+                        "description": "User username",
                         "required": true,
-                        "type": "integer"
+                        "type": "string"
+                    },
+                    {
+                        "name": "email",
+                        "in": "path",
+                        "description": "User email",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "nickname",
+                        "in": "path",
+                        "description": "User nickname",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "phone_number",
+                        "in": "path",
+                        "description": "User phone number",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "location",
+                        "in": "path",
+                        "description": "User location",
+                        "required": true,
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "introduction",
+                        "in": "path",
+                        "description": "User introduction",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "profile_photo",
+                        "in": "path",
+                        "description": "User profile_photo",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "background_photo",
+                        "in": "path",
+                        "description": "User background_photo",
+                        "required": true,
+                        "type": "string"
                     }
                 ],
                 "responses": {
@@ -762,6 +808,9 @@
                     },
                     "401": {
                         "description": "Unauthorized user"
+                    },
+                    "500": {
+                        "description": "error something went wrong"
                     }
                 }
             }
@@ -830,13 +879,13 @@
                 "id": {
                     "type": "integer"
                 },
-                "name": {
+                "username": {
                     "type": "string"
                 },
                 "email": {
                     "type": "string"
                 },
-                "nickanme": {
+                "nickname": {
                     "type": "string"
                 },
                 "age": {
@@ -846,13 +895,35 @@
                     "type": "string"
                 },
                 "location": {
-                    "type": "string"
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 },
                 "introduction": {
                     "type": "string"
                 },
-                "photo_name": {
+                "profile_photo": {
                     "type": "string"
+                },
+                "background_photo": {
+                    "type": "string"
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "passport": {
+            "type": "oauth2",
+            "description": "Laravel passport oauth2 security.",
+            "in": "header",
+            "scheme": "https",
+            "flows": {
+                "password": {
+                    "authorizationUrl": "http://localhost/oauth/authorize",
+                    "tokenUrl": "http://localhost/oauth/token",
+                    "refreshUrl": "http://localhost/token/refresh",
+                    "scopes": []
                 }
             }
         }

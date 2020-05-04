@@ -22,9 +22,10 @@ use Illuminate\Http\Request;
 
     Route::group(['middleware' => 'auth:api'], function () {
         Route::post('logout','User\AuthController@logout');
+        //for user profile
+        Route::get('profile/show', 'User\UserProfileController@show');
+        Route::post('profile/update', 'User\UserProfileController@update');
     });
-
-
     //for beauty or salon
     Route::group(['prefix'=>'stylist'], function () {
     Route::post('register', 'Stylist\AuthController@register');
@@ -41,7 +42,7 @@ use Illuminate\Http\Request;
             Route::post('add_service', 'Stylist\SalonController@addService');
             Route::get('my_services', 'Stylist\SalonController@listServices');
             Route::get('delete_service/{id}', 'Stylist\SalonController@deleteService');
-            //postStyile 
+            //postStyile
             Route::post('make_style_post', 'Stylist\StylePostController@createStylePost');
             Route::get('delete_post/{id}', 'Stylist\StylePostController@deletePost');
             Route::get('show_all_post', 'Stylist\StylePostController@showAllPosts');
@@ -49,7 +50,7 @@ use Illuminate\Http\Request;
             Route::post('update_post/{id}', 'Stylist\StylePostController@updateStylePost');
         });
     });
-    
+
     //for admin
     Route::group(['prefix'=>'admin'], function () {
         Route::post('register', 'Admin\AuthController@register');
