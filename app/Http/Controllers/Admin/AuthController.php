@@ -11,7 +11,7 @@ use Validator;
 class AuthController extends Controller
 {
     public $successStatus = 200;
-    
+
     /** 
      * Register api 
      * 
@@ -23,7 +23,6 @@ class AuthController extends Controller
             'username' => 'required', 
             'email'    => 'required|email', 
             'password' => 'required', 
-    
         ]);
         
         if ($validator->fails()) { 
