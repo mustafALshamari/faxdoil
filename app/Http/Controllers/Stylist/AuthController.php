@@ -49,35 +49,33 @@ class AuthController extends Controller
      *         response="401",
      *         description="validation error",
      *     ),
-     *
      * )
      */
     public function register(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'name'     => 'required',
-            'email'    => 'required|unique:users',
-            'password' => 'required',
-
+        $validator = Validator::make(
+            $request->all(), [
+            'username'       => 'required|unique:users',
+            'email'          => 'required|unique:users',
+            'password'       => 'required',
         ]);
 
         if ($validator->fails()) {
-            return response()->json(['error'=>$validator->errors()], 401);
+            return response()->json(['error'=>$validator->errors()], 422);
         }
 
-        $input = $request->all();
+        $input              = $request->all();
+        $input['email']     = strtolower($input['email']);
+        $input['password']  = bcrypt($input['password']);
+        $input['user_type'] = 'stylist';
 
-        $input['password'] = bcrypt($input['password']);
-        $user              = User::create($input);
-        $thisUser          = User::findOrfail($user->id);
-        $stylist           = Stylist::create(['user_id'=> $thisUser->id]);
-        $success           = [
-            'message' => 'You have successfully been registered',
-            'token'   => $user->createToken('kaiApp')->accessToken,
-            'name'    => $user->name
-        ];
+        $user = User::create($input);
+
+        $success['message']   = 'You have successfully been registered';
+        $success['token']     = $user->createToken('kaiApp')->accessToken;
+        $success['username']  = $user->username;
+        $success['user_type'] = $user->user_type;
 
         return response()->json(['success'=>$success], $this->successStatus);
     }
-
 }
