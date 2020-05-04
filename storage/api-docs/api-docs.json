@@ -219,7 +219,7 @@
                         "in": "path",
                         "description": "price",
                         "required": false,
-                        "type": "string"
+                        "type": "integer"
                     }
                 ],
                 "responses": {
@@ -605,6 +605,107 @@
                         "passport": []
                     }
                 ]
+            }
+        },
+        "/api/forgot/password": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "register new user",
+                "description": "check email if exist and send reset email link",
+                "parameters": [
+                    {
+                        "name": "email",
+                        "in": "path",
+                        "description": "email",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "We have e-mailed your password reset link!",
+                        "schema": {
+                            "$ref": "#/definitions/User"
+                        }
+                    },
+                    "404": {
+                        "description": "We can't find a user with that e-mail address."
+                    }
+                }
+            }
+        },
+        "/api/find/{token}": {
+            "get": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "find token password reset",
+                "description": "find token password reset",
+                "parameters": [
+                    {
+                        "name": "email",
+                        "in": "path",
+                        "description": "token",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "return json PasswordRest object ",
+                        "schema": {
+                            "$ref": "#/definitions/User"
+                        }
+                    },
+                    "404": {
+                        "description": "This password reset token is invalid.."
+                    }
+                }
+            }
+        },
+        "/api/email/reset": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "register new user",
+                "description": "check email if exist and send reset email link",
+                "parameters": [
+                    {
+                        "name": "email",
+                        "in": "path",
+                        "description": "email",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "password",
+                        "in": "path",
+                        "description": "password",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "token",
+                        "in": "path",
+                        "description": "token",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "user object",
+                        "schema": {
+                            "$ref": "#/definitions/User"
+                        }
+                    },
+                    "404": {
+                        "description": "This password reset token is invalid."
+                    }
+                }
             }
         },
         "/api/profile/show": {

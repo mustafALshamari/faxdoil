@@ -19,7 +19,7 @@ class AuthController extends Controller
     public function register(Request $request) 
     { 
         $validator = Validator::make($request->all(), [ 
-            'name'     => 'required', 
+            'username'     => 'required', 
             'email'    => 'required|email', 
             'password' => 'required', 
     
@@ -30,11 +30,13 @@ class AuthController extends Controller
         }
 
         $input = $request->all(); 
+        $input['email']    = strtolower($input['email']); 
         $input['password'] = bcrypt($input['password']); 
 
         $user              = User::create($input); 
+
         $success['token']  = $user->createToken('kaiApp')->accessToken; 
-        $success['name']   = $user->name;
+        $success['username']   = $user->username;
 
         return response()->json(['success'=>$success], $this->successStatus); 
     }   

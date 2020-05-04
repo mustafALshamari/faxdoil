@@ -126,6 +126,7 @@ class StylePostController extends Controller
                 $data             = $this->uploadPostImage($request->images ,Auth::id());
                 $stylePost->media = json_encode($data); 
             }
+
             // this might be needed for future 
             // if ($request->hasFile('clip')) {
             //     $data             = $this->uploadClip($request->clip ,Auth::id());

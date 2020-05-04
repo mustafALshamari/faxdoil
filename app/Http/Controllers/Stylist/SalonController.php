@@ -72,7 +72,6 @@ class SalonController extends Controller
      *     ),
      * )
      */
-
     public function addSalon(Request $request)
     {
        $validator =  Validator::make(
@@ -92,8 +91,7 @@ class SalonController extends Controller
 
             if ($salon) {
                 $this->updateSalon($salon , $request);
-            }
-            else{
+            } else {
                 $salon = new Salon();
                 
                 if ($request->name) {
@@ -124,9 +122,9 @@ class SalonController extends Controller
             $stylist->save();
 
             return response()->json(['success','successfully created your salon'], 200);
-            } catch (Exception $e) {
-                return response()->json(['error' => 'something went wrong!'], 500);
-            }
+        } catch (Exception $e) {
+            return response()->json(['error' => 'something went wrong!'], 500);
+        }
     }
 
     /**
@@ -165,9 +163,9 @@ class SalonController extends Controller
             }
 
             return response()->json(['success' => 'successfully updated your salon'],200);
-            } catch (Exception $e) {
-                return response()->json(['error' => 'something went wrong!'], 500);
-            }
+        } catch (Exception $e) {
+            return response()->json(['error' => 'something went wrong!'], 500);
+        }
     }
 
     /**
@@ -246,10 +244,11 @@ class SalonController extends Controller
             }
 
             return response()->json(['message' => 'location updated successfuly'], 200);
-        }else{
+        } else {
             return response()->json(['error' => 'something went wrong!'], 500);
         }
     }
+
     /**
      * @SWG\Get(
      *     path="/api/stylist/show_my_location",
@@ -276,10 +275,11 @@ class SalonController extends Controller
             $mySalon = Salon::find($salonOwner)->first();
             
             return response()->json(
-                ['location' => ['address'  => $mySalon->address ,
-                                'latitude' => $mySalon->latitude ,
-                               'longitude' => $mySalon->longitude] ]
-                               , 200);
+                ['location' => [
+                    'address'  => $mySalon->address ,
+                    'latitude' => $mySalon->latitude ,
+                    'longitude' => $mySalon->longitude
+                    ] ], 200);
         } catch (Exception $e) { 
             return response()->json(['error' => 'something went wrong!'], 500);
         }

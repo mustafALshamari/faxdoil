@@ -13,17 +13,19 @@ use Illuminate\Http\Request;
 |
 */
 
-// for user
-
+    // for user
     Route::post('register', 'User\AuthController@register');
     Route::post('login', 'User\AuthController@login');
+    Route::post('forgot/password', 'User\AuthController@create');
+    Route::get('find/{token}', 'User\AuthController@find');
+    Route::post('email/reset', 'User\AuthController@reset');
 
     Route::group(['middleware' => 'auth:api'], function () {
     Route::post('logout','User\AuthController@logout');
     });
 
 
-//for beauty or salon
+    //for beauty or salon
     Route::group(['prefix'=>'stylist'], function () {
     Route::post('register', 'Stylist\AuthController@register');
 
@@ -47,3 +49,9 @@ use Illuminate\Http\Request;
     Route::post('update_post/{id}', 'Stylist\StylePostController@updateStylePost');
     });
     });
+    
+    //for admin
+    Route::group(['prefix'=>'admin'], function () {
+    Route::post('register', 'Admin\AuthController@register');
+    });
+

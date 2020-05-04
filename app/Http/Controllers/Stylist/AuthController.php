@@ -13,6 +13,7 @@ use Validator;
 class AuthController extends Controller
 {
     public $successStatus = 200;
+    
      /**
      * @SWG\Post(
      *     path="/api/stylist/register",
@@ -51,28 +52,29 @@ class AuthController extends Controller
      *     ),
      * )
      */
-    public function register(Request $request) 
-    { 
+    public function register(Request $request)
+    {
         $validator = Validator::make(
-            $request->all(), [ 
-            'username'   => 'required|unique:users', 
-            'email'      => 'required|unique:users',
-            'password'   => 'required', 
+            $request->all(), [
+            'username'       => 'required|unique:users',
+            'email'          => 'required|unique:users',
+            'password'       => 'required',
         ]);
 
-        if ($validator->fails()) { 
-            return response()->json(['error'=>$validator->errors()], 401);            
+        if ($validator->fails()) {
+            return response()->json(['error'=>$validator->errors()], 422);
         }
 
-        $input               = $request->all(); 
-        $input['password']   = bcrypt($input['password']); 
-        $user                = User::create($input); 
-        $thisUser            = User::findOrfail($user->id);
-        $stylist             = Stylist::create(['user_id'=> $thisUser->id]);
+        $input              = $request->all();
+        $input['email']     = strtolower($input['email']); 
+        $input['password']  = bcrypt($input['password']);
+
+        $user = User::create($input);
+
         $success['message']  = 'You have successfully been registered';
-        $success['token']    = $user->createToken('kaiApp')->accessToken; 
+        $success['token']    = $user->createToken('kaiApp')->accessToken;
         $success['username'] = $user->username;
-        
-            return response()->json(['success'=>$success], $this->successStatus); 
+
+        return response()->json(['success'=>$success], $this->successStatus);
     }
 }
