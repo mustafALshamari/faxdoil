@@ -7,7 +7,7 @@
     "host": "https://api-kai-dev.newlinetechno.net",
     "basePath": "/",
     "schemes": [
-        "https"
+       "http", "https"
     ],
     "paths": {
         "/api/stylist/register": {
