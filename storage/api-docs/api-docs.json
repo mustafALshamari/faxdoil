@@ -4,10 +4,10 @@
         "title": "KAI API",
         "version": "1.0.0"
     },
-    "host": "localhost:8000",
+    "host": "https://api-kai-dev.newlinetechno.net/",
     "basePath": "/",
     "schemes": [
-        "http"
+        "https"
     ],
     "paths": {
         "/api/stylist/register": {
@@ -416,9 +416,9 @@
             "scheme": "https",
             "flows": {
                 "password": {
-                    "authorizationUrl": "http://localhost:8200/oauth/authorize",
-                    "tokenUrl": "http://localhost:8200/oauth/token",
-                    "refreshUrl": "http://localhost:8200/token/refresh",
+                    "authorizationUrl": "https://api-kai-dev.newlinetechno.net/oauth/authorize",
+                    "tokenUrl": "https://api-kai-dev.newlinetechno.net/oauth/token",
+                    "refreshUrl": "https://api-kai-dev.newlinetechno.net/token/refresh",
                     "scopes": []
                 }
             }
