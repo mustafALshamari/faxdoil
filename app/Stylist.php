@@ -11,7 +11,13 @@ class Stylist extends Model
         'user_id'
     ];
 
-    public function user(){
+    public function user()
+    {
         return $this->belongsTo('App\User');
+    }
+
+    public function stylePost()
+    {
+        return $this->hasMany('App\StylePost');
     }
 }
