@@ -1,5 +1,6 @@
 #!/bin/bash
 
+#Permission 
 chown -R root:www-data /var/www/api
 chmod -R 775 /var/www/api/storage /var/www/api/bootstrap/cache
 chgrp -R www-data /var/www/api/storage /var/www/api/bootstrap/cache
