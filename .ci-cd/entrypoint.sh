@@ -47,6 +47,7 @@ entrypoint () {
 }
 
 main () {
+    set_env
     permission
     php_action
     entrypoint
