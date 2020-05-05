@@ -37,5 +37,5 @@ COPY database ./database
 
 RUN composer install
 
-ENTRYPOINT [".ci-cd/entrypoint.sh"]
+ENTRYPOINT ["bash", ".ci-cd/entrypoint.sh"]
 
