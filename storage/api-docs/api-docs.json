@@ -53,6 +53,226 @@
                 }
             }
         },
+        "/api/stylist/show_my_profile": {
+            "get": {
+                "tags": [
+                    "Stylist"
+                ],
+                "summary": "Get stylist profile",
+                "description": "Get profile data",
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "schema": {
+                            "$ref": "#/definitions/User"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized user"
+                    }
+                }
+            }
+        },
+        "/api/stylist/show/{username}": {
+            "get": {
+                "tags": [
+                    "Stylist"
+                ],
+                "summary": "Get another stylist profile",
+                "description": "Get profile data",
+                "parameters": [
+                    {
+                        "name": "username",
+                        "in": "path",
+                        "description": "Username",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "schema": {
+                            "$ref": "#/definitions/User"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized user"
+                    }
+                }
+            }
+        },
+        "/api/stylist/show_review/{username}": {
+            "get": {
+                "tags": [
+                    "Stylist"
+                ],
+                "summary": "Get stylist profile id",
+                "description": "Get profile data",
+                "parameters": [
+                    {
+                        "name": "username",
+                        "in": "path",
+                        "description": "Username",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "schema": {
+                            "$ref": "#/definitions/StylistReview"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized user"
+                    },
+                    "500": {
+                        "description": "error something went wrong"
+                    }
+                }
+            }
+        },
+        "/api/stylist/add_review/{username}": {
+            "get": {
+                "tags": [
+                    "Stylist"
+                ],
+                "summary": "Add user review for stylist",
+                "description": "Add review",
+                "parameters": [
+                    {
+                        "name": "username",
+                        "in": "path",
+                        "description": "Username",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "comment",
+                        "in": "path",
+                        "description": "User comment",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "rate",
+                        "in": "path",
+                        "description": "User rate",
+                        "required": true,
+                        "type": "integer"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation"
+                    },
+                    "401": {
+                        "description": "Unauthorized user"
+                    },
+                    "500": {
+                        "description": "error something went wrong"
+                    }
+                }
+            }
+        },
+        "/api/stylist/show_salon/{username}": {
+            "get": {
+                "tags": [
+                    "Stylist"
+                ],
+                "summary": "Get stylist profile id",
+                "description": "Get profile data",
+                "parameters": [
+                    {
+                        "name": "username",
+                        "in": "path",
+                        "description": "Username",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "schema": {
+                            "$ref": "#/definitions/StylistReview"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized user"
+                    },
+                    "500": {
+                        "description": "error something went wrong"
+                    }
+                }
+            }
+        },
+        "/api/stylist/follow/{username}": {
+            "post": {
+                "tags": [
+                    "Stylist"
+                ],
+                "summary": "Add follow",
+                "description": "Add follow between user and stylist",
+                "parameters": [
+                    {
+                        "name": "username",
+                        "in": "path",
+                        "description": "Username of stylist",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "You have successfully subscribed to username"
+                    },
+                    "401": {
+                        "description": "Unauthorized user"
+                    },
+                    "422": {
+                        "description": "You are already subscribed to to username"
+                    },
+                    "500": {
+                        "description": "error something went wrong"
+                    }
+                }
+            }
+        },
+        "/api/stylist/unfollow/{username}": {
+            "post": {
+                "tags": [
+                    "Stylist"
+                ],
+                "summary": "Delete follow",
+                "description": "Delete follow between user and stylist",
+                "parameters": [
+                    {
+                        "name": "username",
+                        "in": "path",
+                        "description": "Username of stylist",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Subscription was successfully deleted"
+                    },
+                    "401": {
+                        "description": "Unauthorized user"
+                    },
+                    "422": {
+                        "description": "Something went wrong"
+                    },
+                    "500": {
+                        "description": "error something went wrong"
+                    }
+                }
+            }
+        },
         "/api/stylist/add_salon": {
             "post": {
                 "tags": [
@@ -708,6 +928,38 @@
                 }
             }
         },
+        "/api/profile/show_user/{username}": {
+            "get": {
+                "tags": [
+                    "User Profile"
+                ],
+                "summary": "Get user profile",
+                "description": "Get another user profile",
+                "parameters": [
+                    {
+                        "name": "username",
+                        "in": "path",
+                        "description": "User username",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "schema": {
+                            "$ref": "#/definitions/User"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized user"
+                    },
+                    "500": {
+                        "description": "error something went wrong"
+                    }
+                }
+            }
+        },
         "/api/profile/show": {
             "get": {
                 "tags": [
@@ -743,35 +995,35 @@
                         "name": "username",
                         "in": "path",
                         "description": "User username",
-                        "required": true,
+                        "required": false,
                         "type": "string"
                     },
                     {
                         "name": "email",
                         "in": "path",
                         "description": "User email",
-                        "required": true,
+                        "required": false,
                         "type": "string"
                     },
                     {
                         "name": "nickname",
                         "in": "path",
                         "description": "User nickname",
-                        "required": true,
+                        "required": false,
                         "type": "string"
                     },
                     {
                         "name": "phone_number",
                         "in": "path",
                         "description": "User phone number",
-                        "required": true,
+                        "required": false,
                         "type": "string"
                     },
                     {
                         "name": "location",
                         "in": "path",
                         "description": "User location",
-                        "required": true,
+                        "required": false,
                         "type": "array",
                         "items": {
                             "type": "string"
@@ -781,21 +1033,21 @@
                         "name": "introduction",
                         "in": "path",
                         "description": "User introduction",
-                        "required": true,
+                        "required": false,
                         "type": "string"
                     },
                     {
                         "name": "profile_photo",
                         "in": "path",
                         "description": "User profile_photo",
-                        "required": true,
+                        "required": false,
                         "type": "string"
                     },
                     {
                         "name": "background_photo",
                         "in": "path",
                         "description": "User background_photo",
-                        "required": true,
+                        "required": false,
                         "type": "string"
                     }
                 ],
@@ -806,8 +1058,8 @@
                             "$ref": "#/definitions/User"
                         }
                     },
-                    "401": {
-                        "description": "Unauthorized user"
+                    "422": {
+                        "description": "validation error"
                     },
                     "500": {
                         "description": "error something went wrong"
@@ -874,6 +1126,59 @@
                 }
             }
         },
+        "Stylist": {
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "nickanme": {
+                    "type": "string"
+                },
+                "age": {
+                    "type": "integer"
+                },
+                "phone_number": {
+                    "type": "string"
+                },
+                "location": {
+                    "type": "string"
+                },
+                "introduction": {
+                    "type": "string"
+                },
+                "profile_photo": {
+                    "type": "string"
+                },
+                "background_photo": {
+                    "type": "string"
+                }
+            }
+        },
+        "StylistReview": {
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "comment": {
+                    "type": "string"
+                },
+                "rate": {
+                    "type": "integer"
+                },
+                "user_id": {
+                    "type": "integer"
+                },
+                "stylist_id": {
+                    "type": "integer"
+                }
+            }
+        },
         "User": {
             "properties": {
                 "id": {
@@ -894,12 +1199,6 @@
                 "phone_number": {
                     "type": "string"
                 },
-                "location": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
                 "introduction": {
                     "type": "string"
                 },
@@ -907,6 +1206,12 @@
                     "type": "string"
                 },
                 "background_photo": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "whats_app": {
                     "type": "string"
                 }
             }
@@ -920,9 +1225,9 @@
             "scheme": "https",
             "flows": {
                 "password": {
-                    "authorizationUrl": "http://localhost/oauth/authorize",
-                    "tokenUrl": "http://localhost/oauth/token",
-                    "refreshUrl": "http://localhost/token/refresh",
+                    "authorizationUrl": "http://localhost:8200/oauth/authorize",
+                    "tokenUrl": "http://localhost:8200/oauth/token",
+                    "refreshUrl": "http://localhost:8200/token/refresh",
                     "scopes": []
                 }
             }

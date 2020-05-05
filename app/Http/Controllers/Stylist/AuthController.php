@@ -71,7 +71,7 @@ class AuthController extends Controller
 
         $user    = User::create($input);
         $stylist = Stylist::create(['user_id' => $user->id]);
-        
+
         $success['message']   = 'You have successfully been registered';
         $success['token']     = $user->createToken('kaiApp')->accessToken;
         $success['username']  = $user->username;

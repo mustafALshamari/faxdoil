@@ -17,8 +17,8 @@ class CreateServicesTable extends Migration
             $table->bigIncrements('id');
             $table->string('name');
             $table->double('price')->nullable();
-            $table->unsignedBigInteger('salon_id')->nullable(); 
-            $table->foreign('salon_id')->references('id')->on('salons'); 
+            $table->unsignedBigInteger('salon_id')->nullable();
+            $table->foreign('salon_id')->references('id')->on('salons');
             $table->timestamps();
         });
     }
