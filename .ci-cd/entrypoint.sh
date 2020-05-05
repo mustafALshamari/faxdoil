@@ -1,25 +1,48 @@
 #!/bin/bash
 
-#Permission 
+info () {
+    lgreen='\033[1;32m'
+    nc='\033[0m'
+    printf "${lgreen}[info] ${@}${nc}\n"
+}
+
+set_env () {
+    info "Set environment"
+    path_to_api="/var/www/api"
+    path_to_storage="${path_to_api}/storage"
+    path_to_cache="${path_to_api}/bootstrap/cache"
+
+}
+
 permission () {
-    chown -R root:www-data /var/www/api
-    chmod -R 775 /var/www/api/storage /var/www/api/bootstrap/cache
-    chgrp -R www-data /var/www/api/storage /var/www/api/bootstrap/cache
+    info "Configuration permission"
+    chown -R root:www-data ${path_to_api}
+    chmod -R 775 ${path_to_storage} ${path_to_cache}
+    chgrp -R www-data ${path_to_storage} ${path_to_cache}
 }
 
 php_action () {
-    php /var/www/api/artisan key:generate
-    php /var/www/api/artisan passport:install
-    php /var/www/api/artisan migrate:refresh
-    php /var/www/api/artisan passport:client --personal
-    php /var/www/api/artisan db:seed --class=AdminTableDataSeeder
-    php /var/www/api/artisan l5-swagger:generate
-    php /var/www/api/artisan artisan cache:clear 
-    php /var/www/api/artisan artisan view:clear 
-    php /var/www/api/artisan artisan route:cache
+    info "Php commands execution"
+    php_command=( "key:generate" 
+    		  "passport:install" 
+		  "migrate:refresh" 
+		  "passport:client --personal" 
+		  "db:seed --class=AdminTableDataSeeder" 
+		  "l5-swagger:generate" 
+		  "cache:clear"
+		  "view:clear"
+		  "route:cache"
+    )
+
+    path_to_artisan="/var/www/api/artisan"
+
+    for action in ${php_command[@]}; do
+        echo "php ${path_to_artisan} ${action}"
+    done
 }
 
-entrypoint () { 
+entrypoint () {
+    info "Launch of services php-fpm and nginx"
     php-fpm -D && nginx -g 'daemon off;'
 }
 
