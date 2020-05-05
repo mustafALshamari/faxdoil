@@ -26,8 +26,8 @@ php_action () {
     php_command=( 'key:generate' 
     		  'passport:install' 
 		  'migrate:refresh'
-		  'passport:client --personal'
-		  'db:seed --class=AdminTableDataSeeder' 
+		  "passport:client --personal"
+		  "db:seed --class=AdminTableDataSeeder" 
 		  'l5-swagger:generate' 
 		  'cache:clear'
 		  'view:clear'
@@ -36,7 +36,7 @@ php_action () {
 
     path_to_artisan="/var/www/api/artisan"
 
-    for action in ${php_command[@]}; do
+    for action in "${php_command[@]}"; do
         info "php ${path_to_artisan} ${action}"
         php ${path_to_artisan} ${action}
     done
