@@ -37,7 +37,7 @@ php_action () {
     path_to_artisan="/var/www/api/artisan"
 
     for action in ${php_command[@]}; do
-        info "php ${path_to_artisan} ${action}
+        info "php ${path_to_artisan} ${action}"
         php ${path_to_artisan} ${action}
     done
 }
