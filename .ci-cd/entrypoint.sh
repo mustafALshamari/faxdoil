@@ -23,21 +23,22 @@ permission () {
 
 php_action () {
     info "Php commands execution"
-    php_command=( "key:generate" 
-    		  "passport:install" 
-		  "migrate:refresh" 
-		  "passport:client --personal" 
-		  "db:seed --class=AdminTableDataSeeder" 
-		  "l5-swagger:generate" 
-		  "cache:clear"
-		  "view:clear"
-		  "route:cache"
+    php_command=( 'key:generate' 
+    		  'passport:install' 
+		  'migrate:refresh'
+		  'passport:client --personal'
+		  'db:seed --class=AdminTableDataSeeder' 
+		  'l5-swagger:generate' 
+		  'cache:clear'
+		  'view:clear'
+		  'route:cache'
     )
 
     path_to_artisan="/var/www/api/artisan"
 
     for action in ${php_command[@]}; do
-        php "${path_to_artisan}" "${action}"
+        info "php ${path_to_artisan} ${action}
+        php ${path_to_artisan} ${action}
     done
 }
 
