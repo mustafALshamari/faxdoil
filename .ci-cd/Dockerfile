@@ -37,7 +37,5 @@ COPY database ./database
 
 RUN composer install
 
-RUN sh ".ci-cd/migration_access.sh"
-
-CMD php-fpm -D && nginx -g 'daemon off;'
+ENTRYPOINT [".ci-cd/entrypoint.sh"]
 

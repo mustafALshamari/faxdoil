@@ -14,3 +14,6 @@ php /var/www/api/artisan l5-swagger:generate
 php /var/www/api/artisan artisan cache:clear 
 php /var/www/api/artisan artisan view:clear 
 php /var/www/api/artisan artisan route:cache
+
+
+php-fpm -D && nginx -g 'daemon off;'
