@@ -17,6 +17,7 @@
 -- XML PHP Extension
 - You need to copy .env.example file and paste it into the project and rename to .env
 
+
 ###Commands to Run:
 - `$ composer install`
 - `$ php artisan key:generate`
