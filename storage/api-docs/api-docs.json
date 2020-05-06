@@ -7,7 +7,7 @@
     "host": "https://api-kai-dev.newlinetechno.net",
     "basePath": "/",
     "schemes": [
-       "http", "https"
+        "https"
     ],
     "paths": {
         "/api/stylist/register": {
@@ -1194,7 +1194,7 @@
                     "type": "string"
                 },
                 "age": {
-                    "type": "integer"
+                    "type": "string"
                 },
                 "phone_number": {
                     "type": "string"
@@ -1212,6 +1212,9 @@
                     "type": "string"
                 },
                 "whats_app": {
+                    "type": "string"
+                },
+                "user_type": {
                     "type": "string"
                 }
             }

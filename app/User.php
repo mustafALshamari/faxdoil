@@ -28,7 +28,7 @@ use Laravel\Passport\HasApiTokens;
  *  ),
  *  @SWG\Property(
  *      property="age",
- *      type="integer"
+ *      type="string"
  *  ),
  *  @SWG\Property(
  *      property="phone_number",
@@ -52,6 +52,10 @@ use Laravel\Passport\HasApiTokens;
  *  ),
  *  @SWG\Property(
  *      property="whats_app",
+ *      type="string"
+ *  ),
+ *  @SWG\Property(
+ *      property="user_type",
  *      type="string"
  *  )
  * )
@@ -81,7 +85,8 @@ class User extends Authenticatable
         'background_photo',
         'user_type',
         'created_at',
-        'whats_app'
+        'whats_app',
+        'user_type'
     ];
 
     /**

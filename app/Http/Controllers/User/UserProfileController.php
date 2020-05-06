@@ -107,6 +107,7 @@ class UserProfileController extends Controller
         $data['introduction']     = $user_data->introduction;
         $data['profile_photo']    = $user_data->profile_photo;
         $data['background_photo'] = $user_data->background_photo;
+        $data['whats_app']        = $user_data->whats_app;
 
         return response()->json([
             'data'    => $data,
@@ -243,6 +244,10 @@ class UserProfileController extends Controller
             }
         }
 
+        if ($request->whats_app) {
+            $user->whats_app = $request->whats_app;
+        }
+
         $data['username']           = $user->username;
         $data['email']              = $user->email;
         $data['fullname']           = $user->fullname;
@@ -253,6 +258,7 @@ class UserProfileController extends Controller
         $data['address']            = $user->address;
         $data['latitude']           = $user->latitude;
         $data['longitude']          = $user->longitude;
+        $data['whats_app']          = $user->whats_app;
 
         $user->save();
 
