@@ -238,9 +238,17 @@ class UserProfileController extends Controller
 
         if ($request->location) {
             foreach ($request->location as $key => $value) {
-                $user->address   = $value['address'];
-                $user->latitude  = $value['latitude'];
-                $user->longitude = $value['longitude'];
+                if ($key == 'address') {
+                    $user->address   = $value;
+                }
+
+                if ($key == 'latitude') {
+                    $user->latitude   = $value;
+                }
+
+                if ($key == 'longitude') {
+                    $user->longitude   = $value;
+                }
             }
         }
 
