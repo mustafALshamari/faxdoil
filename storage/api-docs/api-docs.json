@@ -433,13 +433,6 @@
                         "description": "name",
                         "required": true,
                         "type": "string"
-                    },
-                    {
-                        "name": "price",
-                        "in": "path",
-                        "description": "price",
-                        "required": false,
-                        "type": "integer"
                     }
                 ],
                 "responses": {
@@ -463,7 +456,7 @@
                 ]
             }
         },
-        "/api/stylist/my_service": {
+        "/api/stylist/my_services": {
             "get": {
                 "tags": [
                     "Salon"
@@ -501,6 +494,68 @@
                         "schema": {
                             "$ref": "#/definitions/Services"
                         }
+                    },
+                    "500": {
+                        "description": "error something went wrong"
+                    }
+                },
+                "security": [
+                    {
+                        "passport": []
+                    }
+                ]
+            }
+        },
+        "/api/stylist/show_service/{id}": {
+            "get": {
+                "tags": [
+                    "Salon"
+                ],
+                "summary": "show specifc service",
+                "description": "show sservice",
+                "responses": {
+                    "200": {
+                        "description": "service",
+                        "schema": {
+                            "$ref": "#/definitions/Services"
+                        }
+                    },
+                    "500": {
+                        "description": "error something went wrong"
+                    }
+                },
+                "security": [
+                    {
+                        "passport": []
+                    }
+                ]
+            }
+        },
+        "/api/stylist/update_service/{id}": {
+            "post": {
+                "tags": [
+                    "Salon"
+                ],
+                "summary": "add service to salon",
+                "description": "update services",
+                "parameters": [
+                    {
+                        "name": "name",
+                        "in": "path",
+                        "description": "name",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "service added successfuly",
+                        "schema": {
+                            "$ref": "#/definitions/Services"
+                        }
+                    },
+                    "422": {
+                        "description": "validation error"
                     },
                     "500": {
                         "description": "error something went wrong"
@@ -641,7 +696,7 @@
                 "description": "show some style post'",
                 "responses": {
                     "200": {
-                        "description": "show specific post for stylist",
+                        "description": "show specific post object for stylist ",
                         "schema": {
                             "$ref": "#/definitions/StylePost"
                         }
@@ -1095,9 +1150,6 @@
             "properties": {
                 "name": {
                     "type": "string"
-                },
-                "price": {
-                    "type": "string"
                 }
             }
         },
@@ -1228,9 +1280,9 @@
             "scheme": "https",
             "flows": {
                 "password": {
-                    "authorizationUrl": "http://localhost:8200/oauth/authorize",
-                    "tokenUrl": "http://localhost:8200/oauth/token",
-                    "refreshUrl": "http://localhost:8200/token/refresh",
+                    "authorizationUrl": "http://localhost/oauth/authorize",
+                    "tokenUrl": "http://localhost/oauth/token",
+                    "refreshUrl": "http://localhost/token/refresh",
                     "scopes": []
                 }
             }

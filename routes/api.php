@@ -46,6 +46,8 @@ use Illuminate\Http\Request;
             Route::get('show_salon/{username}','Stylist\ProfileController@showSalon');
             //for salon
             Route::post('add_salon', 'Stylist\SalonController@addSalon');
+            Route::get('profile','Stylist\SalonController@index');
+            Route::post('add_salon', 'Stylist\SalonController@addSalon');
             Route::post('update_salon', 'Stylist\SalonController@updateSalonInfo');
             Route::post('update_images', 'Stylist\SalonController@updateImages');
             Route::post('update_location', 'Stylist\SalonController@updateLocation');
@@ -55,6 +57,14 @@ use Illuminate\Http\Request;
             Route::post('add_service', 'Stylist\SalonController@addService');
             Route::get('my_services', 'Stylist\SalonController@listServices');
             Route::get('delete_service/{id}', 'Stylist\SalonController@deleteService');
+            Route::get('show_service/{id}', 'Stylist\SalonController@showService');
+            Route::post('update_service/{id}', 'Stylist\SalonController@updateService');
+            //menu
+            Route::post('add_item', 'Stylist\SalonController@addItem');
+            Route::get('show_items', 'Stylist\SalonController@showItems');
+            Route::get('delete_item/{id}', 'Stylist\SalonController@deleteItem');
+            Route::get('show_items/{id}', 'Stylist\SalonController@showItems');
+            Route::get('update_items/{id}', 'Stylist\SalonController@editItems');
             //postStyile
             Route::post('make_style_post', 'Stylist\StylePostController@createStylePost');
             Route::get('delete_post/{id}', 'Stylist\StylePostController@deletePost');
