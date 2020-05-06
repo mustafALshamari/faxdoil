@@ -14,9 +14,14 @@ use App\PasswordReset;
 use Validator;
 use DB;
 
+/**
+ * Class AuthController
+ * @package App\Http\Controllers\User
+ */
 class AuthController extends Controller
 {
     public $successStatus = 200;
+
     /**
      * @SWG\Post(
      *     path="/api/login",
