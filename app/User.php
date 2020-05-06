@@ -130,4 +130,14 @@ class User extends Authenticatable
     {
         return $this->hasMany('App\StylistReview');
     }
+
+    function PostLike()
+    {
+        return $this->hasMany('App\PostLike');
+    }
+
+    function comment()
+    {
+        return $this->hasMany('App\PostComment');
+    }
 }

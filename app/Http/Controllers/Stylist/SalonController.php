@@ -324,8 +324,8 @@ class SalonController extends Controller
             if ($validator->fails()) {
                 return response()->json(['error' => $validator->errors()], 422);
             }
-
-            $salonOwner = $this->findStylistById(Auth::id());
+            
+            $stylist = $this->findStylistById(Auth::id());
 
             $service            = new Services();
             $service->name      = $request->name;
@@ -334,7 +334,11 @@ class SalonController extends Controller
 
             $service->save();
 
-            return response()->json(['message' => 'service added successfuly'], 200);
+                return response()->json(['message' => 'service added successfuly'], 200);
+            
+           
+            return response()->json(['message' => 'not allowed '], 200);
+            
         } catch (Exception $e) {
             return response()->json(['error' => 'something went wrong!'], 500);
         }

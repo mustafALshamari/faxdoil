@@ -8,11 +8,14 @@ use App\User;
 use App\Salon;
 use App\Stylist;
 use App\StylePost;
+use App\PostLike;
+use App\PostComment;
 use Validator;
 use Exception;
 use DB;
 use Auth;
 use File;
+use Arr;
 
 class StylePostController extends Controller
 {
@@ -139,7 +142,7 @@ class StylePostController extends Controller
 
             return response()->json(
                 ['success' => $stylePost ,
-                'message' => 'post updated successfully'] ,
+                'message' => 'post created successfully'] ,
                 200);
         } catch (Exception $e) {
             return response()->json(['error' => 'something went wrong!'], 500);
@@ -242,7 +245,7 @@ class StylePostController extends Controller
  
      *     @SWG\Response(
      *         response=200,
-     *         description="show specific post for stylist",
+     *         description="show specific post object for stylist ",
      *         @SWG\Schema(ref="#/definitions/StylePost"),
      *     ),
      *     @SWG\Response(
@@ -255,10 +258,27 @@ class StylePostController extends Controller
     public function showPost($id)
     {
         try {
-            $stylePost = StylePost::findOrfail($id)->first();
+            $stylePost             = StylePost::findOrfail($id);
+            $stylePost['author']   = User::findOrfail($stylePost->stylist_id)
+                                         ->makeHidden(
+                                            ['email',
+                                            'email_verified_at',
+                                            'age',
+                                            'created_at',
+                                            'updated_at',
+                                            'introduction']
+                                            );
+            $stylePost['likes']    = count(PostLike::where('post_id' ,$id)->get());
+            $stylePost['comments'] = DB::table('post_comments')
+                                        ->join('users','post_comments.user_id','=','users.id')
+                                        ->select('username','comment','post_comments.created_at'
+                                        ,'photo_name','post_comments.updated_at','post_comments.style_post_id')
+                                        ->where('post_comments.style_post_id', '=' , $id)
+                                        ->get();
+            $stylePost['views']    = '0';
 
             if ($stylePost){
-                return response()->json(['stylePost' => $stylePost] , 200);
+                return response()->json(['post' => $stylePost] , 200);
             }
 
         } catch (Exception $e) {

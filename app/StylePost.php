@@ -53,6 +53,16 @@ class StylePost extends Model
 
     public function stylist()
     {
-        $this->belongsTo('App\Stylist');
+      return $this->belongsTo('App\Stylist');
+    }
+
+    public function PostLike()
+    {
+        return $this->hasMany('App\PostLike');
+    }
+    
+    public function comment()
+    {
+        return $this->hasMany('App\PostComment');
     }
 }
