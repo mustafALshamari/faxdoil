@@ -14,9 +14,14 @@ use App\PasswordReset;
 use Validator;
 use DB;
 
+/**
+ * Class AuthController
+ * @package App\Http\Controllers\User
+ */
 class AuthController extends Controller
 {
     public $successStatus = 200;
+
     /**
      * @SWG\Post(
      *     path="/api/login",
@@ -114,7 +119,7 @@ class AuthController extends Controller
         }
 
         $input              = $request->all();
-        $input['email']     = strtolower($input['email']); 
+        $input['email']     = strtolower($input['email']);
         $input['password']  = bcrypt($input['password']);
         $input['user_type'] = 'user';
 
@@ -150,7 +155,7 @@ class AuthController extends Controller
             ->update(['revoked' => true ]);
 
         $accessToken->revoke();
-        
+
         return response()->json(['message' => 'See you soon!'] ,  $this->successStatus);
     }
 
@@ -189,9 +194,9 @@ class AuthController extends Controller
             return response()->json([
                 'message' => 'We can\'t find a user with that e-mail address.'
                 ], 404);
-            
+
         }
-            
+
         $passwordReset = PasswordReset::updateOrCreate(
             ['email' => $user->email],
              [
@@ -208,7 +213,7 @@ class AuthController extends Controller
             return response()->json([
                 'message' => 'We have e-mailed your password reset link!',
                 200]);
-        }         
+        }
     }
 
      /**
@@ -238,7 +243,7 @@ class AuthController extends Controller
     public function find($token)
     {
         $passwordReset = PasswordReset::where('token', $token)->first();
-        
+
         if (!$passwordReset) {
             return response()->json([
                 'message' => 'This password reset token is invalid.'
@@ -252,7 +257,7 @@ class AuthController extends Controller
                 'message' => 'This password reset token is invalid.'
             ], 404);
         }
-        
+
         return response()->json($passwordReset , 200);
     }
 
@@ -316,7 +321,7 @@ class AuthController extends Controller
         $user = User::where('email', $passwordReset->email)->first();
 
         if (!$user) {
-            
+
             return response()->json([
                 'message' => 'We can\'t find a user with that e-mail address.'
                 ], 404);
@@ -326,7 +331,7 @@ class AuthController extends Controller
         $user->save();
         $passwordReset->delete();
         $user->notify(new PasswordResetSuccess($passwordReset));
-        
+
         return response()->json($user, 200);
     }
 }

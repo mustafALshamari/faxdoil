@@ -13,7 +13,11 @@ use Illuminate\Http\Request;
 |
 */
 
-    // for user
+
+
+
+
+// for user
     Route::post('register', 'User\AuthController@register');
     Route::post('login', 'User\AuthController@login');
     Route::post('forgot/password', 'User\AuthController@create');
@@ -24,13 +28,28 @@ use Illuminate\Http\Request;
         Route::post('logout','User\AuthController@logout');
         //for user profile
         Route::get('profile/show', 'User\UserProfileController@show');
+        Route::get('profile/show_user/{username}', 'User\UserProfileController@showUser');
         Route::post('profile/update', 'User\UserProfileController@update');
     });
-    //for beauty or salon
+//for beauty or salon
     Route::group(['prefix'=>'stylist'], function () {
     Route::post('register', 'Stylist\AuthController@register');
-
         Route::group(['middleware' => 'auth:api'], function () {
+            //for stylist info
+            Route::get('show_my_profile','Stylist\ProfileController@showMyProfile');
+            Route::post('add_salon', 'Stylist\SalonController@addSalon');
+            Route::get('show/{username}','Stylist\ProfileController@show');
+            Route::post('update','User\UserProfileController@update');
+            //for follow/unfollow
+            Route::post('follow/{username}','Stylist\ProfileController@follow');
+            Route::post('unfollow/{username}','Stylist\ProfileController@unfollow');
+            //reviews
+            Route::get('show_reviews/{username}','Stylist\ProfileController@showReviews');
+            Route::post('add_review/{username}','Stylist\ProfileController@addReview');
+            //for salon
+            Route::get('show_salon/{username}','Stylist\ProfileController@showSalon');
+            //for salon
+            Route::post('add_salon', 'Stylist\SalonController@addSalon');
             Route::get('profile','Stylist\SalonController@index');
             Route::post('add_salon', 'Stylist\SalonController@addSalon');
             Route::post('update_salon', 'Stylist\SalonController@updateSalonInfo');

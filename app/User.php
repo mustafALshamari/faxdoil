@@ -28,17 +28,11 @@ use Laravel\Passport\HasApiTokens;
  *  ),
  *  @SWG\Property(
  *      property="age",
- *      type="integer"
+ *      type="string"
  *  ),
  *  @SWG\Property(
  *      property="phone_number",
  *      type="string"
- *  ),
- *  @SWG\Property(
- *      property="location",
- *      type="array",
- *      @SWG\Items(type="string")
- *
  *  ),
  *  @SWG\Property(
  *      property="introduction",
@@ -50,6 +44,18 @@ use Laravel\Passport\HasApiTokens;
  *  ),
  *  @SWG\Property(
  *      property="background_photo",
+ *      type="string"
+ *  ),
+ *  @SWG\Property(
+ *      property="created_at",
+ *      type="string"
+ *  ),
+ *  @SWG\Property(
+ *      property="whats_app",
+ *      type="string"
+ *  ),
+ *  @SWG\Property(
+ *      property="user_type",
  *      type="string"
  *  )
  * )
@@ -68,12 +74,18 @@ class User extends Authenticatable
         'username',
         'email',
         'password',
-        'nickname',
+        'fullname',
         'age',
         'phone_number',
-        'location',
+        'address',
+        'latitude',
+        'longitude',
         'introduction',
-        'photo_name',
+        'profile_photo',
+        'background_photo',
+        'user_type',
+        'created_at',
+        'whats_app',
         'user_type'
     ];
 
@@ -95,8 +107,27 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
     public function stylist()
     {
         return $this->hasOne('App\Stylist');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function stylistFollowers()
+    {
+        return $this->hasMany('App\StylistFollowers');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function stylistReview()
+    {
+        return $this->hasMany('App\StylistReview');
     }
 }

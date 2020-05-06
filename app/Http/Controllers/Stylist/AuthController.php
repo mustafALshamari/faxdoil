@@ -69,7 +69,8 @@ class AuthController extends Controller
         $input['password']  = bcrypt($input['password']);
         $input['user_type'] = 'stylist';
 
-        $user = User::create($input);
+        $user    = User::create($input);
+        $stylist = Stylist::create(['user_id' => $user->id]);
 
         $success['message']   = 'You have successfully been registered';
         $success['token']     = $user->createToken('kaiApp')->accessToken;
