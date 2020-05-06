@@ -184,14 +184,13 @@ class SalonController extends Controller
      *         response="500",
      *         description="error something went wrong",
      *     ),
-     * 
      * )
      */
     public function showMySalon()
     {
         try{
             $salonOwner = $this->findStylistById(Auth::id());
-            $mySalon    = Salon::find($salonOwner)->first();
+            $mySalon    = Salon::find($salonOwner->salon_id)->first();
             
             return response()->json(['salon' => $mySalon], 200);
         } catch (Exception $e) {
@@ -299,13 +298,6 @@ class SalonController extends Controller
      *         required=true,
      *         type="string",
      *     ),
-     *     @SWG\Parameter(
-     *         name="price",
-     *         in="path",
-     *         description="price",
-     *         required=false,
-     *         type="integer",
-     *     ),
      *     @SWG\Response(
      *         response=200,
      *         description="service added successfuly",
@@ -314,13 +306,11 @@ class SalonController extends Controller
      *   @SWG\Response(
      *         response=422,
      *         description="validation error",
-     *        
      *     ),
      *     @SWG\Response(
      *         response="500",
      *         description="error something went wrong",
      *     ),
-     * 
      * )
      */
      public function addService(Request $request)
@@ -328,7 +318,6 @@ class SalonController extends Controller
         $validator =  Validator::make(
             $request->all() ,[
              'name'      => 'required',
-             'price'     => 'numeric'
          ]);
 
         try{
@@ -353,7 +342,7 @@ class SalonController extends Controller
      
     /**
      * @SWG\Get(
-     *     path="/api/stylist/my_service",
+     *     path="/api/stylist/my_services",
      *     summary="show salon's services for stylis 'for self'",
      *     tags={"Salon"},
      *     description="get salon services'",
@@ -397,16 +386,101 @@ class SalonController extends Controller
      *         response="500",
      *         description="error something went wrong",
      *     ),
-     * 
      * )
      */
     public function deleteService($id)
     {
        try{
-           $service = Services::findOrfail($id);
+           $salonOwner  = $this->findStylistById(Auth::id());
+           $service     =  Services::where('salon_id', $salonOwner->salon_id)
+                                   ->where('id',$id);
+
            $service->delete();
 
            return response()->json(['success' => 'service deleted'] , 200);
+       } catch (Exception $e) {
+           return response()->json(['error' => 'something went wrong!'], 500);
+       }
+    }
+
+    /**
+     * @SWG\Get(
+     *     path="/api/stylist/show_service/{id}",
+     *     summary="show specifc service",
+     *     tags={"Salon"},
+     *     description="show sservice",
+     *     security={{"passport": {}}},
+     *     @SWG\Response(
+     *         response=200,
+     *         description="service",
+     *         @SWG\Schema(ref="#/definitions/Services"),
+     *     ),
+     *     @SWG\Response(
+     *         response="500",
+     *         description="error something went wrong",
+     *     ),
+     * )
+     */
+    public function showService($id)
+    {
+       try{
+           $service = Services::findOrfail($id);
+
+           return response()->json(['service' => $service] , 200);
+       } catch (Exception $e) {
+           return response()->json(['error' => 'something went wrong!'], 500);
+       }
+    }
+
+    /**
+     * @SWG\Post(
+     *     path="/api/stylist/update_service/{id}",
+     *     summary="add service to salon",
+     *     tags={"Salon"},
+     *     description="update services",
+     *     security={{"passport": {}}},
+     *     @SWG\Parameter(
+     *         name="name",
+     *         in="path",
+     *         description="name",
+     *         required=true,
+     *         type="string",
+     *     ),
+     *     @SWG\Response(
+     *         response=200,
+     *         description="service added successfuly",
+     *         @SWG\Schema(ref="#/definitions/Services"),
+     *     ),
+     *   @SWG\Response(
+     *         response=422,
+     *         description="validation error",
+     *        
+     *     ),
+     *     @SWG\Response(
+     *         response="500",
+     *         description="error something went wrong",
+     *     ),
+     * )
+     */
+    public function updateService(Request $request ,$id)
+    {
+        $validator =  Validator::make(
+            $request->all() ,[
+             'name'      => 'required',
+             ]);
+
+        try {
+            if ($validator->fails()) {
+
+                return response()->json(['error' => $validator->errors()], 422);
+            }
+
+            $salonOwner    = $this->findStylistById(Auth::id());
+            $service       =  Services::where('salon_id', $salonOwner->salon_id)
+                                    ->where('id',$id);
+            $service->name = $request->name;
+
+            return response()->json(['service' => $service, 'message' => 'service updateed'] , 200);
        } catch (Exception $e) {
            return response()->json(['error' => 'something went wrong!'], 500);
        }

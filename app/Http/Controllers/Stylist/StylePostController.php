@@ -225,6 +225,7 @@ class StylePostController extends Controller
     {
         try {
             $stylePost = StylePost::all();
+            
                 return response()->json(['stylePosts' => $stylePost] , 200);
         } catch (Exception $e) {
             return response()->json(['error' => 'something went wrong!'], 500);
