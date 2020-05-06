@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateStylistsFollowersTable extends Migration
+class CreateStylistReviews extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,10 @@ class CreateStylistsFollowersTable extends Migration
      */
     public function up()
     {
-        Schema::create('stylist_followers', function (Blueprint $table) {
+        Schema::create('stylist_reviews', function (Blueprint $table) {
             $table->bigIncrements('id');
+            $table->smallInteger('rate');
+            $table->text('comment');
             $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users');
             $table->unsignedBigInteger('stylist_id');
@@ -30,6 +32,6 @@ class CreateStylistsFollowersTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('stylists_followers');
+        Schema::dropIfExists('stylist_reviews');
     }
 }

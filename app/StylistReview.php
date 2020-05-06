@@ -4,7 +4,32 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class StylistFollower extends Model
+/**
+ * @SWG\Definition(
+ *  definition="StylistReview",
+ *  @SWG\Property(
+ *      property="id",
+ *      type="integer"
+ *  ),
+ *  @SWG\Property(
+ *      property="comment",
+ *      type="string"
+ *  ),
+ *  @SWG\Property(
+ *      property="rate",
+ *      type="integer"
+ *  ),
+ *  @SWG\Property(
+ *      property="user_id",
+ *      type="integer"
+ *  ),
+ *  @SWG\Property(
+ *      property="stylist_id",
+ *      type="integer"
+ *  )
+ * )
+ */
+class StylistReview extends Model
 {
     /**
      * The attributes that are mass assignable.
@@ -12,6 +37,8 @@ class StylistFollower extends Model
      * @var array
      */
     protected $fillable = [
+        'comment',
+        'rate',
         'user_id',
         'stylist_id'
     ];

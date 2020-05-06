@@ -16,7 +16,6 @@ use Illuminate\Database\Eloquent\Model;
  *      property="name",
  *      type="string"
  *  ),
-
  *  @SWG\Property(
  *      property="address",
  *      type="string"
@@ -45,6 +44,14 @@ class Salon extends Model
         'latitude',
         'longitude'
     ];
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function stylist()
+    {
+        return $this->belongsTo('App\Stylist');
+    }
 
     public function service()
     {
