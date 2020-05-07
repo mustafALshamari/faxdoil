@@ -11,13 +11,13 @@ set_env () {
     path_to_api="/var/www/api"
     path_to_storage="${path_to_api}/storage"
     path_to_cache="${path_to_api}/bootstrap/cache"
-
+    path_to_log="${path_to_storage}/logs/laravel.log"
 }
 
 permission () {
     info "Configuration permission"
     chown -R www-data:www-data "${path_to_api}"
-    chmod -R 775 "${path_to_storage} ${path_to_cache}"
+    chmod -R 775 "${path_to_storage} ${path_to_cache} ${path_to_log}"
 }
 
 php_action () {
