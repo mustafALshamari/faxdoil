@@ -59,12 +59,6 @@ use Illuminate\Http\Request;
             Route::get('delete_service/{id}', 'Stylist\SalonController@deleteService');
             Route::get('show_service/{id}', 'Stylist\SalonController@showService');
             Route::post('update_service/{id}', 'Stylist\SalonController@updateService');
-            //menu
-            Route::post('add_item', 'Stylist\SalonController@addItem');
-            Route::get('show_items', 'Stylist\SalonController@showItems');
-            Route::get('delete_item/{id}', 'Stylist\SalonController@deleteItem');
-            Route::get('show_items/{id}', 'Stylist\SalonController@showItems');
-            Route::get('update_items/{id}', 'Stylist\SalonController@editItems');
             //postStyile
             Route::post('make_style_post', 'Stylist\StylePostController@createStylePost');
             Route::get('delete_post/{id}', 'Stylist\StylePostController@deletePost');
