@@ -8,6 +8,7 @@ use App\User;
 use App\Salon;
 use App\Stylist;
 use App\Services;
+use App\Menu;
 use Validator;
 use Exception;
 use DB;
@@ -334,10 +335,7 @@ class SalonController extends Controller
 
             $service->save();
 
-                return response()->json(['message' => 'service added successfuly'], 200);
-            
-           
-            return response()->json(['message' => 'not allowed '], 200);
+            return response()->json(['message' => 'service added successfuly'], 200);
             
         } catch (Exception $e) {
             return response()->json(['error' => 'something went wrong!'], 500);
@@ -409,7 +407,40 @@ class SalonController extends Controller
 
     /**
      * @SWG\Get(
-     *     path="/api/stylist/show_service/{id}",
+     *     path="/api/stylist/delete_item/{id}",
+     *     summary="delete specifc item of menu",
+     *     tags={"Menu"},
+     *     description="delete item of menu",
+     *     security={{"passport": {}}},
+     *     @SWG\Response(
+     *         response=200,
+     *         description="item deleted",
+     *         @SWG\Schema(ref="#/definitions/Item"),
+     *     ),
+     *     @SWG\Response(
+     *         response="500",
+     *         description="error something went wrong",
+     *     ),
+     * )
+     */
+    public function deleteItem($id)
+    {
+       try{
+           $salonOwner  = $this->findStylistById(Auth::id());
+           $menu     =  Menu::where('salon_id', $salonOwner->salon_id)
+                                   ->where('id',$id);
+
+           $menu->delete();
+
+           return response()->json(['success' => 'menu deleted'] , 200);
+       } catch (Exception $e) {
+           return response()->json(['error' => 'something went wrong!'], 500);
+       }
+    }
+
+    /**
+     * @SWG\Get(
+     *     path="/api/stylist/show_item/{id}",
      *     summary="show specifc service",
      *     tags={"Salon"},
      *     description="show sservice",
@@ -485,6 +516,101 @@ class SalonController extends Controller
             $service->name = $request->name;
 
             return response()->json(['service' => $service, 'message' => 'service updateed'] , 200);
+       } catch (Exception $e) {
+           return response()->json(['error' => 'something went wrong!'], 500);
+       }
+    }
+
+     /**
+     * @SWG\Post(
+     *     path="/api/stylist/add_item",
+     *     summary="add menu to salon",
+     *     tags={"Menu"},
+     *     description="add menu item to menu",
+     *     security={{"passport": {}}},
+     *     @SWG\Parameter(
+     *         name="name",
+     *         in="path",
+     *         description="name",
+     *         required=true,
+     *         type="string",
+     *     ),
+     *  @SWG\Parameter(
+     *         name="price",
+     *         in="path",
+     *         description="price",
+     *         required=true,
+     *         type="string",
+     *     ),
+     *     @SWG\Response(
+     *         response=200,
+     *         description="menu added successfuly",
+     *         @SWG\Schema(ref="#/definitions/Menu"),
+     *     ),
+     *   @SWG\Response(
+     *         response=422,
+     *         description="validation error",
+     *     ),
+     *     @SWG\Response(
+     *         response="500",
+     *         description="error something went wrong",
+     *     ),
+     * )
+     */
+    public function addMenu(Request $request)
+    {
+       $validator =  Validator::make(
+           $request->all() ,[
+            'name'      => 'required',
+            'price'      => 'required',
+        ]);
+
+       try{
+           if ($validator->fails()) {
+               return response()->json(['error' => $validator->errors()], 422);
+           }
+           
+           $stylist = $this->findStylistById(Auth::id());
+
+           $menu            = new Menu();
+           $menu->name      = $request->name;
+           $menu->price     = $request->price;
+           $menu->salon_id  = $salonOwner->salon_id;
+
+           $menu->save();
+
+          return response()->json(['message' => 'item added successfuly'], 200);
+           
+       } catch (Exception $e) {
+           return response()->json(['error' => 'something went wrong!'], 500);
+       }
+    }
+
+    /**
+     * @SWG\Get(
+     *     path="/api/stylist/show_items",
+     *     summary="show salon's menu for stylis 'for self'",
+     *     tags={"Salon"},
+     *     description="get salon menu'",
+     *     security={{"passport": {}}},
+     *     @SWG\Response(
+     *         response=200,
+     *         description="return all salon menu",
+     *         @SWG\Schema(ref="#/definitions/Menu"),
+     *     ),
+     *     @SWG\Response(
+     *         response="500",
+     *         description="error something went wrong",
+     *     ),
+     * )
+     */
+    public function showItems()
+    {
+       try{
+           $salonOwner  = $this->findStylistById(Auth::id());
+           $allServices =  Salon::findOrfail($salonOwner->salon_id)->menu;
+           
+           return response()->json( ['allServices' => $allServices ], 200);
        } catch (Exception $e) {
            return response()->json(['error' => 'something went wrong!'], 500);
        }
