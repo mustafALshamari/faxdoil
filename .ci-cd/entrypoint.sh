@@ -17,6 +17,7 @@ set_env () {
 
 permission () {
     info "Configuration permission"
+    touch "${path_to_log}"
     chown -R www-data:www-data "${path_to_api} ${path_to_log}"
     chmod -R ug+rwx "${path_to_storage} ${path_to_cache} ${path_to_log}"
 }
