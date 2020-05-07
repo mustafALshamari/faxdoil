@@ -11,6 +11,10 @@ use Illuminate\Database\Eloquent\Model;
  *      property="name",
  *      type="string"
  *  ),
+ *  @SWG\Property(
+ *      property="price",
+ *      type="string"
+ *  ),
  * )
  */
 class Services extends Model
@@ -18,6 +22,7 @@ class Services extends Model
     protected $fillable = 
     [
         'name',
+        'price',
         'salon_id',
     ];
 
