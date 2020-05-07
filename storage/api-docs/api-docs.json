@@ -433,6 +433,13 @@
                         "description": "name",
                         "required": true,
                         "type": "string"
+                    },
+                    {
+                        "name": "price",
+                        "in": "path",
+                        "description": "price",
+                        "required": true,
+                        "type": "string"
                     }
                 ],
                 "responses": {
@@ -543,6 +550,13 @@
                         "name": "name",
                         "in": "path",
                         "description": "name",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "price",
+                        "in": "path",
+                        "description": "price",
                         "required": true,
                         "type": "string"
                     }
@@ -1150,6 +1164,9 @@
             "properties": {
                 "name": {
                     "type": "string"
+                },
+                "price": {
+                    "type": "string"
                 }
             }
         },
@@ -1280,9 +1297,9 @@
             "scheme": "https",
             "flows": {
                 "password": {
-                    "authorizationUrl": "http://localhost/oauth/authorize",
-                    "tokenUrl": "http://localhost/oauth/token",
-                    "refreshUrl": "http://localhost/token/refresh",
+                    "authorizationUrl": "http://localhost:8200/oauth/authorize",
+                    "tokenUrl": "http://localhost:8200/oauth/token",
+                    "refreshUrl": "http://localhost:8200/token/refresh",
                     "scopes": []
                 }
             }

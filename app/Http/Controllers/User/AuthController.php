@@ -58,8 +58,9 @@ class AuthController extends Controller
         if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
             $user = Auth::user();
 
-            $success['token']    = $user->createToken('MyApp')->accessToken;
-            $success['username'] = $user->username;
+            $success['token']     = $user->createToken('MyApp')->accessToken;
+            $success['username']  = $user->username;
+            $success['user_type'] = $user->user_type;
 
             return response()->json(['success' => $success], $this->successStatus);
         } else {
@@ -125,9 +126,9 @@ class AuthController extends Controller
 
         $user = User::create($input);
 
-        $success['message']  = 'You have successfully been registered';
-        $success['token']    = $user->createToken('kaiApp')->accessToken;
-        $success['username'] = $user->username;
+        $success['message']   = 'You have successfully been registered';
+        $success['token']     = $user->createToken('kaiApp')->accessToken;
+        $success['username']  = $user->username;
         $success['user_type'] = $user->user_type;
 
         return response()->json(['success'=>$success], $this->successStatus);

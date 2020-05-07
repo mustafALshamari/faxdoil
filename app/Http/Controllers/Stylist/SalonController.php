@@ -60,7 +60,7 @@ class SalonController extends Controller
      *     ),
      *     @SWG\Response(
      *         response=200,
-     *         description="successful operation message ",   
+     *         description="successful operation message ",
      *     ),
      *     @SWG\Response(
      *         response="422",
@@ -93,7 +93,7 @@ class SalonController extends Controller
                 $this->updateSalon($salon , $request);
             } else {
                 $salon = new Salon();
-                
+
                 if ($request->name) {
                     $salon->name = $request->name;
                 }
@@ -110,7 +110,7 @@ class SalonController extends Controller
                     foreach ($request->file('images') as $file) {
                         $name = time().'.'.$file->getClientOriginalName();
                         $file->move(public_path().'/uploads/salon/'. Auth::id() , $name);
-                        $data[] = $name; 
+                        $data[] = $name;
                     }
                     $salon->images = json_encode($data);
                 }
@@ -130,7 +130,7 @@ class SalonController extends Controller
     /**
      * return data form stylist
      * table by using stylist id
-     * @return array  
+     * @return array
      */
     public function findStylistById($id)
     {
@@ -138,7 +138,7 @@ class SalonController extends Controller
     }
 
     public function updateSalon($salon ,$request)
-    {   
+    {
         try {
             if ($request->name) {
                 $salon->name = $request->name;
@@ -191,7 +191,7 @@ class SalonController extends Controller
         try{
             $salonOwner = $this->findStylistById(Auth::id());
             $mySalon    = Salon::find($salonOwner->salon_id)->first();
-            
+
             return response()->json(['salon' => $mySalon], 200);
         } catch (Exception $e) {
             return response()->json(['error' => 'something went wrong!'], 500);
@@ -221,7 +221,7 @@ class SalonController extends Controller
      *         response="500",
      *         description="error something went wrong",
      *     ),
-     * 
+     *
      * )
      */
     public function updateLocation(Request $request)
@@ -264,22 +264,22 @@ class SalonController extends Controller
      *         response="500",
      *         description="error something went wrong",
      *     ),
-     * 
+     *
      * )
      */
     public function showMyLocation()
     {
         try{
             $salonOwner = $this->findStylistById(Auth::id());
-            $mySalon = Salon::find($salonOwner)->first();
-            
+            $mySalon    = Salon::find($salonOwner)->first();
+
             return response()->json(
                 ['location' => [
-                    'address'  => $mySalon->address ,
-                    'latitude' => $mySalon->latitude ,
+                    'address'   => $mySalon->address ,
+                    'latitude'  => $mySalon->latitude ,
                     'longitude' => $mySalon->longitude
                     ] ], 200);
-        } catch (Exception $e) { 
+        } catch (Exception $e) {
             return response()->json(['error' => 'something went wrong!'], 500);
         }
      }
@@ -295,6 +295,13 @@ class SalonController extends Controller
      *         name="name",
      *         in="path",
      *         description="name",
+     *         required=true,
+     *         type="string",
+     *     ),
+     *  @SWG\Parameter(
+     *         name="price",
+     *         in="path",
+     *         description="price",
      *         required=true,
      *         type="string",
      *     ),
@@ -317,15 +324,16 @@ class SalonController extends Controller
      {
         $validator =  Validator::make(
             $request->all() ,[
-             'name'      => 'required',
+             'name'       => 'required',
+             'price'      => 'required',
          ]);
 
         try{
             if ($validator->fails()) {
                 return response()->json(['error' => $validator->errors()], 422);
             }
-            
-            $stylist = $this->findStylistById(Auth::id());
+
+            $salonOwner = $this->findStylistById(Auth::id());
 
             $service            = new Services();
             $service->name      = $request->name;
@@ -334,16 +342,13 @@ class SalonController extends Controller
 
             $service->save();
 
-                return response()->json(['message' => 'service added successfuly'], 200);
-            
-           
-            return response()->json(['message' => 'not allowed '], 200);
-            
+            return response()->json(['message' => 'service added successfuly'], 200);
+
         } catch (Exception $e) {
             return response()->json(['error' => 'something went wrong!'], 500);
         }
      }
-     
+
     /**
      * @SWG\Get(
      *     path="/api/stylist/my_services",
@@ -367,7 +372,7 @@ class SalonController extends Controller
         try{
             $salonOwner  = $this->findStylistById(Auth::id());
             $allServices =  Salon::findOrfail($salonOwner->salon_id)->service;
-            
+
             return response()->json( ['allServices' => $allServices ], 200);
         } catch (Exception $e) {
             return response()->json(['error' => 'something went wrong!'], 500);
@@ -450,15 +455,22 @@ class SalonController extends Controller
      *         required=true,
      *         type="string",
      *     ),
+     *     @SWG\Parameter(
+     *         name="price",
+     *         in="path",
+     *         description="price",
+     *         required=true,
+     *         type="string",
+     *     ),
      *     @SWG\Response(
      *         response=200,
-     *         description="service added successfuly",
+     *         description="service updated successfuly",
      *         @SWG\Schema(ref="#/definitions/Services"),
      *     ),
      *   @SWG\Response(
      *         response=422,
      *         description="validation error",
-     *        
+     *
      *     ),
      *     @SWG\Response(
      *         response="500",
@@ -470,7 +482,8 @@ class SalonController extends Controller
     {
         $validator =  Validator::make(
             $request->all() ,[
-             'name'      => 'required',
+             'name'       => 'required',
+             'price'      => 'required',
              ]);
 
         try {
@@ -479,10 +492,11 @@ class SalonController extends Controller
                 return response()->json(['error' => $validator->errors()], 422);
             }
 
-            $salonOwner    = $this->findStylistById(Auth::id());
-            $service       =  Services::where('salon_id', $salonOwner->salon_id)
+            $salonOwner     = $this->findStylistById(Auth::id());
+            $service        =  Services::where('salon_id', $salonOwner->salon_id)
                                     ->where('id',$id);
-            $service->name = $request->name;
+            $service->name  = $request->name;
+            $service->price = $request->price;
 
             return response()->json(['service' => $service, 'message' => 'service updateed'] , 200);
        } catch (Exception $e) {
