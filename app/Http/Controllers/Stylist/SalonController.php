@@ -271,12 +271,12 @@ class SalonController extends Controller
     {
         try{
             $salonOwner = $this->findStylistById(Auth::id());
-            $mySalon = Salon::find($salonOwner)->first();
+            $mySalon    = Salon::find($salonOwner)->first();
 
             return response()->json(
                 ['location' => [
-                    'address'  => $mySalon->address ,
-                    'latitude' => $mySalon->latitude ,
+                    'address'   => $mySalon->address ,
+                    'latitude'  => $mySalon->latitude ,
                     'longitude' => $mySalon->longitude
                     ] ], 200);
         } catch (Exception $e) {
@@ -455,55 +455,6 @@ class SalonController extends Controller
      *         required=true,
      *         type="string",
      *     ),
-     *     @SWG\Response(
-     *         response=200,
-     *         description="service added successfuly",
-     *         @SWG\Schema(ref="#/definitions/Services"),
-     *     ),
-     *   @SWG\Response(
-     *         response=422,
-     *         description="validation error",
-     *
-     *     ),
-     *     @SWG\Response(
-     *         response="500",
-     *         description="error something went wrong",
-     *     ),
-     * )
-     */
-    public function updateService(Request $request ,$id)
-    {
-        $validator =  Validator::make(
-            $request->all() ,[
-             'name'      => 'required',
-             ]);
-
-        try {
-            if ($validator->fails()) {
-
-                return response()->json(['error' => $validator->errors()], 422);
-            }
-
-            $salonOwner    = $this->findStylistById(Auth::id());
-            $service       =  Services::where('salon_id', $salonOwner->salon_id)
-                                    ->where('id',$id);
-            $service->name = $request->name;
-
-            return response()->json(['service' => $service, 'message' => 'service updateed'] , 200);
-       } catch (Exception $e) {
-           return response()->json(['error' => 'something went wrong!'], 500);
-       }
-    }
-
-<<<<<<<<< Temporary merge branch 1
-=========
-     /**
-     * @SWG\Post(
-     *     path="/api/stylist/add_item",
-     *     summary="add menu to salon",
-     *     tags={"Menu"},
-     *     description="add menu item to menu",
-     *     security={{"passport": {}}},
      *     @SWG\Parameter(
      *         name="price",
      *         in="path",
@@ -513,12 +464,13 @@ class SalonController extends Controller
      *     ),
      *     @SWG\Response(
      *         response=200,
-     *         description="service added successfuly",
+     *         description="service updated successfuly",
      *         @SWG\Schema(ref="#/definitions/Services"),
      *     ),
      *   @SWG\Response(
      *         response=422,
      *         description="validation error",
+     *
      *     ),
      *     @SWG\Response(
      *         response="500",
