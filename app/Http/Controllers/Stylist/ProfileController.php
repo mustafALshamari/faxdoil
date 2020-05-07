@@ -43,7 +43,24 @@ class ProfileController extends Controller
 
         $selectAllInfoForStylist = DB::table('users')
                                     ->join('stylists', 'stylists.user_id', '=', 'users.id')
-                                    ->select('stylists.id as stylist_id', 'users.*')
+                                    ->select('stylists.id as stylist_id',
+                                            'stylists.salon_id',
+                                            'stylists.is_salon_owner',
+                                            'users.id as user_id',
+                                            'users.username',
+                                            'users.email',
+                                            'users.fullname',
+                                            'users.age',
+                                            'users.phone_number',
+                                            'users.whats_app',
+                                            'users.address',
+                                            'users.introduction',
+                                            'users.longitude',
+                                            'users.latitude',
+                                            'users.profile_photo',
+                                            'users.background_photo',
+                                            'users.user_type'
+                                    )
                                     ->where('stylists.user_id', $id)
                                     ->first();
 
@@ -52,6 +69,7 @@ class ProfileController extends Controller
                         ->get();
         $posts     = StylePost::where('stylist_id', $selectAllInfoForStylist->stylist_id)->get();
         $followers = StylistFollower::where('stylist_id', $selectAllInfoForStylist->stylist_id)->count();
+
         return response()->json([
             'stylist'   => $selectAllInfoForStylist,
             'reviews'   => $reviews,
@@ -254,7 +272,24 @@ class ProfileController extends Controller
     {
         $stylist = DB::table('stylists')
                     ->join('users', 'stylists.user_id', '=', 'users.id')
-                    ->select('stylists.id as stylist_id','stylists.salon_id','stylists.is_salon_owner', 'users.*')
+                    ->select('stylists.id as stylist_id',
+                             'stylists.salon_id',
+                             'stylists.is_salon_owner',
+                             'users.id as user_id',
+                             'users.username',
+                             'users.email',
+                             'users.fullname',
+                             'users.age',
+                             'users.phone_number',
+                             'users.whats_app',
+                             'users.address',
+                             'users.introduction',
+                             'users.longitude',
+                             'users.latitude',
+                             'users.profile_photo',
+                             'users.background_photo',
+                             'users.user_type'
+                    )
                     ->where('users.username', 'like', '%' . $username .'%')
                     ->first();
 
