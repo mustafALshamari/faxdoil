@@ -23,12 +23,12 @@ permission () {
 
 php_action () {
     info "Php commands execution"
-    php_command=( 'key:generate' 
-    		  'passport:install' 
-		  'migrate:refresh'
+    php_command=( 'key:generate'
+    		  'passport:install'
+		  'migrate:fresh'
 		  "passport:client --personal"
-		  "db:seed --class=AdminTableDataSeeder" 
-		  'l5-swagger:generate' 
+		  "db:seed --class=AdminTableDataSeeder"
+		  'l5-swagger:generate'
 		  'cache:clear'
 		  'view:clear'
 		  'route:cache'
