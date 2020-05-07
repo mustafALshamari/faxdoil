@@ -407,40 +407,7 @@ class SalonController extends Controller
 
     /**
      * @SWG\Get(
-     *     path="/api/stylist/delete_item/{id}",
-     *     summary="delete specifc item of menu",
-     *     tags={"Menu"},
-     *     description="delete item of menu",
-     *     security={{"passport": {}}},
-     *     @SWG\Response(
-     *         response=200,
-     *         description="item deleted",
-     *         @SWG\Schema(ref="#/definitions/Item"),
-     *     ),
-     *     @SWG\Response(
-     *         response="500",
-     *         description="error something went wrong",
-     *     ),
-     * )
-     */
-    public function deleteItem($id)
-    {
-       try{
-           $salonOwner  = $this->findStylistById(Auth::id());
-           $menu     =  Menu::where('salon_id', $salonOwner->salon_id)
-                                   ->where('id',$id);
-
-           $menu->delete();
-
-           return response()->json(['success' => 'menu deleted'] , 200);
-       } catch (Exception $e) {
-           return response()->json(['error' => 'something went wrong!'], 500);
-       }
-    }
-
-    /**
-     * @SWG\Get(
-     *     path="/api/stylist/show_item/{id}",
+     *     path="/api/stylist/show_service/{id}",
      *     summary="show specifc service",
      *     tags={"Salon"},
      *     description="show sservice",

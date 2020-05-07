@@ -135,7 +135,7 @@ class ProfileController extends Controller
     }
 
     /**
-     * @SWG\Get(
+     * @SWG\Post(
      *     path="/api/stylist/add_review/{username}",
      *     summary="Add user review for stylist",
      *     tags={"Stylist"},
