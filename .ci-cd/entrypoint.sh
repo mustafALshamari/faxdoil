@@ -16,9 +16,8 @@ set_env () {
 
 permission () {
     info "Configuration permission"
-    chown -R root:www-data ${path_to_api}
-    chmod -R 775 ${path_to_storage} ${path_to_cache}
-    chgrp -R www-data ${path_to_storage} ${path_to_cache}
+    chown -R www-data:www-data "${path_to_api}"
+    chmod -R ug+rwx "${path_to_storage}" ${path_to_cache}
 }
 
 php_action () {
