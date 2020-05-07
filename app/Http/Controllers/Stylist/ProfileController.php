@@ -149,7 +149,7 @@ class ProfileController extends Controller
     {
         $stylist = $this->getStylist($username);
         $reviews = DB::table('stylist_reviews')
-                    ->where('stylist_id', '=',  $stylist->id)
+                    ->where('stylist_id', '=',  $stylist->stylist_id)
                     ->get();
 
         return response()->json([
