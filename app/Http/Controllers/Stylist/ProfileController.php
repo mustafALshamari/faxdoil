@@ -42,18 +42,21 @@ class ProfileController extends Controller
         $id = Auth::id();
 
         $selectAllInfoForStylist = DB::table('users')
-            ->join('stylists', 'stylists.user_id', '=', 'users.id')
-            ->select('stylists.id as stylist_id', 'users.*')
-            ->where('stylists.user_id', $id)
-            ->first();
+                                    ->join('stylists', 'stylists.user_id', '=', 'users.id')
+                                    ->select('stylists.id as stylist_id', 'users.*')
+                                    ->where('stylists.user_id', $id)
+                                    ->first();
 
-        $reviews     = DB::table('stylist_reviews')->where('stylist_id', $selectAllInfoForStylist->stylist_id)->get();
-        $posts       = StylePost::where('stylist_id', $selectAllInfoForStylist->stylist_id)->get();
-
+        $reviews   = DB::table('stylist_reviews')
+                        ->where('stylist_id', $selectAllInfoForStylist->stylist_id)
+                        ->get();
+        $posts     = StylePost::where('stylist_id', $selectAllInfoForStylist->stylist_id)->get();
+        $followers = StylistFollower::where('stylist_id', $selectAllInfoForStylist->stylist_id)->count();
         return response()->json([
-            'stylist' => $selectAllInfoForStylist,
-            'reviews' => $reviews,
-            'posts'   => $posts
+            'stylist'   => $selectAllInfoForStylist,
+            'reviews'   => $reviews,
+            'posts'     => $posts,
+            'followers' => $followers
         ]);
     }
 
@@ -84,7 +87,9 @@ class ProfileController extends Controller
     public function show($username)
     {
         $stylistData = $this->getStylist($username);
-        $reviews     = DB::table('stylist_reviews')->where('stylist_id', $stylistData->stylist_id)->get();
+        $reviews     = DB::table('stylist_reviews')
+                        ->where('stylist_id', $stylistData->stylist_id)
+                        ->get();
         $posts       = StylePost::where('stylist_id', $stylistData->stylist_id)->get();
 
         return response()->json([
@@ -125,7 +130,9 @@ class ProfileController extends Controller
     public function showReviews($username)
     {
         $stylist = $this->getStylist($username);
-        $reviews = DB::table('stylist_reviews')->where('stylist_id', '=',  $stylist->id)->get();
+        $reviews = DB::table('stylist_reviews')
+                    ->where('stylist_id', '=',  $stylist->id)
+                    ->get();
 
         return response()->json([
             'data'    => $reviews,
