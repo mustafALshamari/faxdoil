@@ -50,7 +50,7 @@ class UserProfileController extends Controller
 
         $data['username']         = $user_data->username;
         $data['email']            = $user_data->email;
-        $data['nickname']         = $user_data->nickname;
+        $data['fullname']         = $user_data->fullname;
         $data['phone_number']     = $user_data->phone_number;
         $data['location']         = [
                 'address'   => $user_data->address,
@@ -97,7 +97,7 @@ class UserProfileController extends Controller
 
         $data['username']             = $user_data->username;
         $data['email']            = $user_data->email;
-        $data['nickname']         = $user_data->nickname;
+        $data['fullname']         = $user_data->fullname;
         $data['phone_number']     = $user_data->phone_number;
         $data['location']         = [
             'address'   => $user_data->address,
@@ -137,9 +137,9 @@ class UserProfileController extends Controller
      *         type="string",
      *     ),
      *     @SWG\Parameter(
-     *         name="nickname",
+     *         name="fullname",
      *         in="path",
-     *         description="User nickname",
+     *         description="User fullname",
      *         required=false,
      *         type="string",
      *     ),
