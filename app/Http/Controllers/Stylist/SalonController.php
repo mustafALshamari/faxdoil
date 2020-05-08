@@ -4,6 +4,9 @@ namespace App\Http\Controllers\Stylist;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Notifications\SalonInvitation;
+use Illuminate\Support\Str;
+use App\Invitation;
 use App\User;
 use App\Salon;
 use App\Stylist;
@@ -117,11 +120,13 @@ class SalonController extends Controller
             }
 
             $salon->save();
+
             $stylist           = $this->findStylistById(Auth::id());
             $stylist->salon_id = $salon->id;
             $stylist->save();
 
-            return response()->json(['success','successfully created your salon'], 200);
+            return response()->json(['success' => 'successfully created your salon',
+                                      'salon'  => $salon], 200);
         } catch (Exception $e) {
             return response()->json(['error' => 'something went wrong!'], 500);
         }
@@ -190,8 +195,8 @@ class SalonController extends Controller
     {
         try{
             $salonOwner = $this->findStylistById(Auth::id());
-            $mySalon    = Salon::find($salonOwner->salon_id)->first();
-
+            $mySalon    = Salon::find($salonOwner->salon_id);
+            
             return response()->json(['salon' => $mySalon], 200);
         } catch (Exception $e) {
             return response()->json(['error' => 'something went wrong!'], 500);
@@ -221,7 +226,6 @@ class SalonController extends Controller
      *         response="500",
      *         description="error something went wrong",
      *     ),
-     *
      * )
      */
     public function updateLocation(Request $request)
@@ -264,7 +268,6 @@ class SalonController extends Controller
      *         response="500",
      *         description="error something went wrong",
      *     ),
-     *
      * )
      */
     public function showMyLocation()
@@ -462,6 +465,13 @@ class SalonController extends Controller
      *         required=true,
      *         type="string",
      *     ),
+     *     @SWG\Parameter(
+     *         name="price",
+     *         in="path",
+     *         description="price",
+     *         required=true,
+     *         type="string",
+     *     ),
      *     @SWG\Response(
      *         response=200,
      *         description="service updated successfuly",
@@ -470,7 +480,6 @@ class SalonController extends Controller
      *   @SWG\Response(
      *         response=422,
      *         description="validation error",
-     *
      *     ),
      *     @SWG\Response(
      *         response="500",
@@ -492,8 +501,8 @@ class SalonController extends Controller
                 return response()->json(['error' => $validator->errors()], 422);
             }
 
-            $salonOwner     = $this->findStylistById(Auth::id());
-            $service        =  Services::where('salon_id', $salonOwner->salon_id)
+            $salonOwner    = $this->findStylistById(Auth::id());
+            $service       =  Services::where('salon_id', $salonOwner->salon_id)
                                     ->where('id',$id);
             $service->name  = $request->name;
             $service->price = $request->price;
@@ -507,7 +516,7 @@ class SalonController extends Controller
      public function deleteSalonImages($id)
      {
         try{
-           $stylist = $this->findStylistById(Auth::id());
+            $stylist = $this->findStylistById(Auth::id());
             $salon = Salon::find($stylist->salon_id);
             $images = json_decode($salon->images);
 
@@ -520,4 +529,106 @@ class SalonController extends Controller
             return response()->json(['error' => 'something went wrong!'], 500);
         }
      }
+
+     /**
+     * @SWG\Post(
+     *     path="/api/salon/invite",
+     *     summary="invite stylist to salon",
+     *     tags={"Salon"},
+     *     description="check email if exist and type shoudl be stylist then send email invitation",
+     *     security={{"passport": {}}},
+     *     @SWG\Parameter(
+     *         name="email",
+     *         in="path",
+     *         description="email",
+     *         required=true,
+     *         type="string",
+     *     ),
+     *     @SWG\Response(
+     *         response=200,
+     *         description="Invitation sent to entered email",
+     *     ),
+     *     @SWG\Response(
+     *         response="404",
+     *         description="We can't find a user with that e-mail address.",
+     *     ),
+     * )
+     */
+     public function sendInvitation(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|string|email',
+        ]);
+
+        $user = User::where('email', $request->email)
+                    ->where('user_type','stylist')->first();
+
+        if (!$user) {
+            return response()->json([
+                'message' => 'We can\'t find a user with that e-mail address.'
+                ], 404);
+        }
+
+        $invitation = Invitation::updateOrCreate(
+            ['email' => $user->email],
+             [
+                'name'  => $user->username,
+                'email' => $user->email,
+                'token' => Str::random(60)
+             ]
+        );
+
+        $stylist = $this->findStylistById(Auth::id());
+
+        if ($user && $invitation) {
+            $user->notify(
+                new SalonInvitation($stylist->salon_id)
+            );
+
+            return response()->json([
+                'message' => 'Invitation sent to '.$user->email ]
+                 , 200);
+        }
+    }
+
+    /**
+     * @SWG\Get(
+     *     path="/api/find/salon/{id}",
+     *     summary="find invited salon",
+     *     tags={"Salon"},
+     *     description="find invited salon ",
+     *     @SWG\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="id",
+     *         required=true,
+     *         type="integer",
+     *     ),
+     *     @SWG\Response(
+     *         response=200,
+     *         description="return json salon object",
+     *         @SWG\Schema(ref="#/definitions/Salon"),
+     *     ),
+     *     @SWG\Response(
+     *         response="404",
+     *         description="This password reset token is invalid..",
+     *     ),
+     * )
+     */
+    public function findSalon($id)
+    {
+
+        try{
+            $salon = Salon::findOrfail($id);
+
+            if (!$salon) {
+
+                return response()->json(['salon not found'], 404);
+            }
+
+            return response()->json($salon, 200);
+        } catch (Exception $e) {
+            return response()->json(['error' => 'something went wrong!'], 500);
+        }
+    }
 }

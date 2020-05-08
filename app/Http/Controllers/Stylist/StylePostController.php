@@ -272,7 +272,7 @@ class StylePostController extends Controller
             $stylePost['comments'] = DB::table('post_comments')
                                         ->join('users','post_comments.user_id','=','users.id')
                                         ->select('username','comment','post_comments.created_at'
-                                        ,'photo_name','post_comments.updated_at','post_comments.style_post_id')
+                                        ,'profile_photo','post_comments.updated_at','post_comments.style_post_id')
                                         ->where('post_comments.style_post_id', '=' , $id)
                                         ->get();
             $stylePost['views']    = '0';
