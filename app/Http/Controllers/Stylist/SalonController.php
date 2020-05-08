@@ -195,8 +195,8 @@ class SalonController extends Controller
     {
         try{
             $salonOwner = $this->findStylistById(Auth::id());
-            $mySalon    = Salon::find($salonOwner->salon_id)->first();
-
+            $mySalon    = Salon::find($salonOwner->salon_id);
+            
             return response()->json(['salon' => $mySalon], 200);
         } catch (Exception $e) {
             return response()->json(['error' => 'something went wrong!'], 500);
