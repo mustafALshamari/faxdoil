@@ -258,8 +258,8 @@ class ProfileController extends Controller
     public function showSalon($username)
     {
         $stylist    = $this->getStylist($username);
-        $salon      = Stylist::find($stylist->stylist_id);
-        $salon_data = Salon::find($salon->salon_id);
+        $salon      = Stylist::findOrFail($stylist->stylist_id);
+        $salon_data = Salon::findOrFail($salon->salon_id);
 
         return response()->json([
             'data'    => $salon_data,
