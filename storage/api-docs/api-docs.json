@@ -135,7 +135,7 @@
             }
         },
         "/api/stylist/add_review/{username}": {
-            "get": {
+            "post": {
                 "tags": [
                     "Stylist"
                 ],
@@ -563,7 +563,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "service added successfuly",
+                        "description": "service updated successfuly",
                         "schema": {
                             "$ref": "#/definitions/Services"
                         }
@@ -580,6 +580,66 @@
                         "passport": []
                     }
                 ]
+            }
+        },
+        "/api/salon/invite": {
+            "post": {
+                "tags": [
+                    "Salon"
+                ],
+                "summary": "invite stylist to salon",
+                "description": "check email if exist and type shoudl be stylist then send email invitation",
+                "parameters": [
+                    {
+                        "name": "email",
+                        "in": "path",
+                        "description": "email",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Invitation sent to entered email"
+                    },
+                    "404": {
+                        "description": "We can't find a user with that e-mail address."
+                    }
+                },
+                "security": [
+                    {
+                        "passport": []
+                    }
+                ]
+            }
+        },
+        "/api/find/salon/{id}": {
+            "get": {
+                "tags": [
+                    "Salon"
+                ],
+                "summary": "find invited salon",
+                "description": "find invited salon ",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "id",
+                        "required": true,
+                        "type": "integer"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "return json salon object",
+                        "schema": {
+                            "$ref": "#/definitions/Salon"
+                        }
+                    },
+                    "404": {
+                        "description": "This password reset token is invalid.."
+                    }
+                }
             }
         },
         "/api/stylist/make_style_post": {

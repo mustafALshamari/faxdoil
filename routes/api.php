@@ -30,6 +30,7 @@ use Illuminate\Http\Request;
     //for beauty or salon
     Route::group(['prefix'=>'stylist'], function () {
     Route::post('register', 'Stylist\AuthController@register');
+    Route::get('find/salon/{id}', 'Stylist\SalonController@findSalon');
         Route::group(['middleware' => 'auth:api'], function () {
             //for stylist info
             Route::get('show_my_profile','Stylist\ProfileController@showMyProfile');
@@ -53,6 +54,7 @@ use Illuminate\Http\Request;
             Route::post('update_location', 'Stylist\SalonController@updateLocation');
             Route::get('show_my_salon', 'Stylist\SalonController@showMysalon');
             Route::get('show_my_location', 'Stylist\SalonController@showMyLocation');
+            Route::post('salon/invite', 'Stylist\SalonController@sendInvitation');
             //services
             Route::post('add_service', 'Stylist\SalonController@addService');
             Route::get('my_services', 'Stylist\SalonController@listServices');
