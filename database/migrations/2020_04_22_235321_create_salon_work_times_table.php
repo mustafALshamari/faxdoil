@@ -15,6 +15,13 @@ class CreateSalonWorkTimesTable extends Migration
     {
         Schema::create('salon_work_times', function (Blueprint $table) {
             $table->bigIncrements('id');
+            $table->string('monday')->nullable();
+            $table->string('tuesday')->nullable();
+            $table->string('wednesday')->nullable();
+            $table->string('thursday')->nullable();
+            $table->string('friday')->nullable();
+            $table->string('saturday')->nullable();
+            $table->string('sunday')->nullable();
             $table->unsignedBigInteger('salon_id')->nullable(); 
             $table->foreign('salon_id')->references('id')->on('salons'); 
             $table->timestamps();
