@@ -34,7 +34,6 @@ use Illuminate\Http\Request;
         Route::group(['middleware' => 'auth:api'], function () {
             //for stylist info
             Route::get('show_my_profile','Stylist\ProfileController@showMyProfile');
-            Route::post('add_salon', 'Stylist\SalonController@addSalon');
             Route::get('show/{username}','Stylist\ProfileController@show');
             Route::post('update','User\UserProfileController@update');
             //for follow/unfollow
@@ -45,18 +44,18 @@ use Illuminate\Http\Request;
             Route::post('add_review/{username}','Stylist\ProfileController@addReview');
             //for salon
             Route::get('show_salon/{username}','Stylist\ProfileController@showSalon');
-            //for salon
             Route::post('add_salon', 'Stylist\SalonController@addSalon');
             Route::get('profile','Stylist\SalonController@index');
             Route::post('add_salon', 'Stylist\SalonController@addSalon');
-            Route::post('update_salon', 'Stylist\SalonController@updateSalonInfo');
+            Route::post('update_salon', 'Stylist\SalonController@updateSalon');
             Route::post('update_images', 'Stylist\SalonController@updateImages');
             Route::post('update_location', 'Stylist\SalonController@updateLocation');
             Route::get('show_my_salon', 'Stylist\SalonController@showMysalon');
             Route::get('show_my_location', 'Stylist\SalonController@showMyLocation');
+            Route::get('salon/show_my_beauty_pro', 'Stylist\SalonController@showMyBeautyPro');
+            Route::get('salon/exclude/{beauty_pro_id}', 'Stylist\SalonController@deleteMyBeautyPro');
             Route::post('salon/invite', 'Stylist\SalonController@sendInvitation');
             //services
-            Route::post('add_service', 'Stylist\SalonController@addService');
             Route::get('my_services', 'Stylist\SalonController@listServices');
             Route::get('delete_service/{id}', 'Stylist\SalonController@deleteService');
             Route::get('show_service/{id}', 'Stylist\SalonController@showService');

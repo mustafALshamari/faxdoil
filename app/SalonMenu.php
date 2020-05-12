@@ -6,23 +6,27 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * @SWG\Definition(
- *  definition="Services",
+ *  definition="SalonMenu",
  *  @SWG\Property(
- *      property="name",
+ *      property="item_name",
  *      type="string"
  *  ),
- *  *  @SWG\Property(
+ *  @SWG\Property(
+ *      property="item_price",
+ *      type="string"
+ *  ),
+ *  @SWG\Property(
  *      property="salon_id",
  *      type="integer"
  *  ),
  * )
  */
-class Services extends Model
+class SalonMenu extends Model
 {
-    
     protected $fillable = 
     [
-        'name',
+        'item_name',
+        'item_price',
         'salon_id',
     ];
 

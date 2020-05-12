@@ -7,6 +7,9 @@ use Illuminate\Http\Request;
 use App\Notifications\SalonInvitation;
 use Illuminate\Support\Str;
 use App\Invitation;
+use App\SalonWorkTime;
+use App\SalonMenu;
+use App\SalonEmployee;
 use App\User;
 use App\Salon;
 use App\Stylist;
@@ -16,9 +19,11 @@ use Exception;
 use DB;
 use Auth;
 use File;
+use ProfileController;
 
 class SalonController extends Controller
 {
+    protected $workingTimes;
     /**
      * @SWG\Post(
      *     path="/api/stylist/add_salon",
@@ -61,6 +66,34 @@ class SalonController extends Controller
      *         required=false,
      *         type="string",
      *     ),
+     *    @SWG\Parameter(
+     *         name="service_name[]",
+     *         in="path",
+     *         description="service_name",
+     *         required=false,
+     *         type="string",
+     *     ),
+     *    @SWG\Parameter(
+     *         name="item_name[]",
+     *         in="path",
+     *         description="item_name",
+     *         required=false,
+     *         type="string",
+     *     ),
+     *    @SWG\Parameter(
+     *         name="item_price[]",
+     *         in="path",
+     *         description="item_price",
+     *         required=false,
+     *         type="string",
+     *     ),
+     *    @SWG\Parameter(
+     *         name="working_days[]",
+     *         in="path",
+     *         description="working_days and time object",
+     *         required=false,
+     *         type="string",
+     *     ),
      *     @SWG\Response(
      *         response=200,
      *         description="successful operation message ",
@@ -79,9 +112,12 @@ class SalonController extends Controller
     {
        $validator =  Validator::make(
            $request->all() ,[
-            'name'      => 'required',
-            'location'  => '',
-            'images.*'  => 'mimes:jpg,jpeg,gif,png',
+            'name'              => 'required',
+            'location'          => '',
+            'images.*'          => 'mimes:jpg,jpeg,gif,png',
+            'service_name'      => 'array',
+            'item_name'         => 'array',
+            'item_price'        => 'array'
         ]);
 
         try {
@@ -90,10 +126,12 @@ class SalonController extends Controller
             }
 
             $stylist = $this->findStylistById(Auth::id());
-            $salon = Salon::find($stylist->salon_id);
+            $salon   = Salon::find($stylist->salon_id);
 
             if ($salon) {
-                $this->updateSalon($salon , $request);
+
+                return response()->json(['warnning' => 'you can not create more than 1 salon']
+                                        , 422);
             } else {
                 $salon = new Salon();
 
@@ -111,7 +149,7 @@ class SalonController extends Controller
 
                 if ($request->hasFile('images')) {
                     foreach ($request->file('images') as $file) {
-                        $name = time().'.'.$file->getClientOriginalName();
+                        $name   = time().'.'.$file->getClientOriginalName();
                         $file->move(public_path().'/uploads/salon/'. Auth::id() , $name);
                         $data[] = $name;
                     }
@@ -120,13 +158,41 @@ class SalonController extends Controller
             }
 
             $salon->save();
-
+            
             $stylist           = $this->findStylistById(Auth::id());
             $stylist->salon_id = $salon->id;
             $stylist->save();
 
-            return response()->json(['success' => 'successfully created your salon',
-                                      'salon'  => $salon], 200);
+            if ($request->service_name) {
+                foreach($request->service_name as $service) {
+                    $serviceModel = new Services();
+                    $serviceModel->name = $service;
+                    $serviceModel->salon_id = $salon->id;
+                    $serviceModel->save();
+               }
+            }
+            
+           $services = Salon::find($salon->id)->service;
+
+           if ($request->item_name) {
+                foreach ( $request->item_name as $key => $value){
+                    $dataForMenu = [
+                        'item_name'  => $request->item_name[$key],
+                        'item_price' => $request->item_price[$key] ,
+                        'salon_id'   => $salon->id
+                    ];
+                  $menu =  SalonMenu::insert($dataForMenu);
+               }
+            }
+           
+           $workModel = new SalonWorkTime();  
+           $this->workingDaysCreate($workModel ,$request, $salon->id);
+
+            return response()->json(['success'        => 'successfully created your salon',
+                                      'salon'         => $salon,
+                                      'services'      => $services,
+                                      'salon_time'    => $this->workingTimes], 
+                                      200);
         } catch (Exception $e) {
             return response()->json(['error' => 'something went wrong!'], 500);
         }
@@ -142,15 +208,117 @@ class SalonController extends Controller
         return User::find($id)->stylist;
     }
 
-    public function updateSalon($salon ,$request)
+    /**
+     * @SWG\Post(
+     *     path="/api/stylist/updata_salon",
+     *     summary="create salon",
+     *     tags={"Salon"},
+     *     description="create salon and if exist , then you can update it using this API",
+     *     security={{"passport": {}}},
+     *     @SWG\Parameter(
+     *         name="name",
+     *         in="path",
+     *         description="salon's name",
+     *         required=true,
+     *         type="string",
+     *     ),
+     *     @SWG\Parameter(
+     *         name="location",
+     *         in="path",
+     *         description="location",
+     *         required=false,
+     *         type="string",
+     *     ),
+     *      @SWG\Parameter(
+     *         name="latitude",
+     *         in="path",
+     *         description="latitude",
+     *         required=false,
+     *         type="number",
+     *     ),
+     *     @SWG\Parameter(
+     *         name="longitude",
+     *         in="path",
+     *         description="longitude",
+     *         required=false,
+     *         type="number",
+     *     ),
+     *      @SWG\Parameter(
+     *         name="images[]",
+     *         in="path",
+     *         description="images max 10 pieces",
+     *         required=false,
+     *         type="string",
+     *     ),
+     *      @SWG\Parameter(
+     *         name="service_name[]",
+     *         in="path",
+     *         description="service_name",
+     *         required=false,
+     *         type="string",
+     *     ),
+     *    @SWG\Parameter(
+     *         name="item_name[]",
+     *         in="path",
+     *         description="item_name",
+     *         required=false,
+     *         type="string",
+     *     ),
+     *    @SWG\Parameter(
+     *         name="item_price[]",
+     *         in="path",
+     *         description="item_price",
+     *         required=false,
+     *         type="string",
+     *     ),
+     *    @SWG\Parameter(
+     *         name="working_days[]",
+     *         in="path",
+     *         description="working_days and time object",
+     *         required=false,
+     *         type="string",
+     *     ),
+     *     @SWG\Response(
+     *         response=200,
+     *         description="successful operation message ",
+     *     ),
+     *     @SWG\Response(
+     *         response="422",
+     *         description="validation error",
+     *     ),
+     *     @SWG\Response(
+     *         response="500",
+     *         description="error something went wrong",
+     *     ),
+     * )
+     */
+    public function updateSalon(Request $request)
     {
+        $validator =  Validator::make(
+            $request->all() ,[
+             'name'              => 'required',
+             'location'          => '',
+             'images.*'          => 'mimes:jpg,jpeg,gif,png',
+             'service_name'      => 'array',
+             'item_name'         => 'array',
+             'item_price'        => 'array',
+             'working_days'      =>''
+         ]);
+
         try {
+            $stylist = $this->findStylistById(Auth::id());
+            $salon   = Salon::find($stylist->salon_id);
+
+            if ($validator->fails()) {
+                return response()->json(['error' => $validator->errors()], 422);
+            }
+
             if ($request->name) {
                 $salon->name = $request->name;
             }
 
             if ($request->location) {
-                foreach ($request->location as $key => $value){
+                foreach ($request->location as  $value){
                     $salon->address    = $value['address'];
                     $salon->latitude   = $value['latitude'];
                     $salon->longitude  = $value['longitude'];
@@ -167,7 +335,39 @@ class SalonController extends Controller
                 $salon->images = json_encode($data);
             }
 
-            return response()->json(['success' => 'successfully updated your salon'],200);
+            $salon->save();
+
+            $removeService = Services::where('salon_id', $stylist->salon_id)->delete();
+
+            if ($request->service_name) {
+                foreach($request->service_name as $service) {
+                    $sevicesModel   = new Services();
+                    $sevicesModel->name     = $service;
+                    $sevicesModel->salon_id = $stylist->salon_id;
+
+                    $sevicesModel->save();
+               }
+            }
+
+            $removeService = SalonMenu::where('salon_id', $stylist->salon_id)->delete();
+
+            if ($request->item_name) {
+                foreach ( $request->item_name as $key => $value){
+                    $dataForMenu = [
+                        'item_name'  => $request->item_name[$key],
+                        'item_price' => $request->item_price[$key] ,
+                        'salon_id'   => $salon->id
+                    ];
+                  $menu =  SalonMenu::insert($dataForMenu);
+               }
+            }
+
+            $removeService = SalonWorkTime::where('salon_id', $stylist->salon_id)->delete();
+            $workModel      = new SalonWorkTime();  
+            $this->workingDaysCreate($workModel ,$request, $salon->id);
+
+            return response()->json(['success' => 'successfully updated your salon',
+                                       'salon' => $salon],200);
         } catch (Exception $e) {
             return response()->json(['error' => 'something went wrong!'], 500);
         }
@@ -178,11 +378,11 @@ class SalonController extends Controller
      *     path="/api/stylist/show_my_salon",
      *     summary="show salon info",
      *     tags={"Salon"},
-     *     description="get salon info like name,images ,address for owner 'stylist'",
+     *     description="get salon info like name,images ,address , services ,for owner 'stylist'",
      *     security={{"passport": {}}},
      *     @SWG\Response(
      *         response=200,
-     *         description="salon full info and images",
+     *         description="salon full info and images , beauty pro and working times",
      *         @SWG\Schema(ref="#/definitions/Salon"),
      *     ),
      *     @SWG\Response(
@@ -194,8 +394,48 @@ class SalonController extends Controller
     public function showMySalon()
     {
         try{
-            $salonOwner = $this->findStylistById(Auth::id());
-            $mySalon    = Salon::find($salonOwner->salon_id);
+            $salonOwner                     = $this->findStylistById(Auth::id());
+            $mySalon                        = Salon::find($salonOwner->salon_id);
+            $images                         = json_decode($mySalon->images);
+            $path                           = public_path().'/uploads/salon/'. Auth::id().'/';
+            $mySalon['services']            = Salon::find($salonOwner->salon_id)->service;
+            $mySalon['menu']                = Salon::find($salonOwner->salon_id)->menu;
+            $workTimes                      = Salon::find($salonOwner->salon_id)->workTime;
+
+            if ($workTimes) { 
+                $mySalon['workingTimes']    = 
+                [
+                'monday'    => json_decode($workTimes->monday),
+                'tuesday'   => json_decode($workTimes->tuesday),
+                'wednesday' => json_decode($workTimes->wednesday),
+                'thursday'  => json_decode($workTimes->thursday),
+                'friday'    => json_decode($workTimes->friday),
+                'saturday'  => json_decode($workTimes->saturday),
+                'sunday'    => json_decode($workTimes->sunday),
+                 ];
+            }
+               
+            $salonEmployee                  = Salon::find($salonOwner->salon_id)->beautyPro;
+
+            if (count($salonEmployee)){
+                foreach ($salonEmployee as $pro  )  {
+                    $beautyPro[] = User::find($pro->id);
+                }
+                $mySalon['beautyProfessionals'] = $beautyPro;
+            } else {
+                $mySalon['beautyProfessionals'] = 'No Beauty Pro Found';
+            }
+           
+
+            if ($images) {
+                foreach($images as $image) {
+                    $allImages[] = $path . $image;
+                }
+                $mySalon['images'] = $allImages;    
+
+            } else {
+                $mySalon['images'] = 'no images';
+            }
             
             return response()->json(['salon' => $mySalon], 200);
         } catch (Exception $e) {
@@ -287,71 +527,6 @@ class SalonController extends Controller
         }
      }
 
-     /**
-     * @SWG\Post(
-     *     path="/api/stylist/add_service",
-     *     summary="add service to salon",
-     *     tags={"Salon"},
-     *     description="add services",
-     *     security={{"passport": {}}},
-     *     @SWG\Parameter(
-     *         name="name",
-     *         in="path",
-     *         description="name",
-     *         required=true,
-     *         type="string",
-     *     ),
-     *  @SWG\Parameter(
-     *         name="price",
-     *         in="path",
-     *         description="price",
-     *         required=true,
-     *         type="string",
-     *     ),
-     *     @SWG\Response(
-     *         response=200,
-     *         description="service added successfuly",
-     *         @SWG\Schema(ref="#/definitions/Services"),
-     *     ),
-     *   @SWG\Response(
-     *         response=422,
-     *         description="validation error",
-     *     ),
-     *     @SWG\Response(
-     *         response="500",
-     *         description="error something went wrong",
-     *     ),
-     * )
-     */
-     public function addService(Request $request)
-     {
-        $validator =  Validator::make(
-            $request->all() ,[
-             'name'       => 'required',
-             'price'      => 'required',
-         ]);
-
-        try{
-            if ($validator->fails()) {
-                return response()->json(['error' => $validator->errors()], 422);
-            }
-
-            $salonOwner = $this->findStylistById(Auth::id());
-
-            $service            = new Services();
-            $service->name      = $request->name;
-            $service->price     = $request->price;
-            $service->salon_id  = $salonOwner->salon_id;
-
-            $service->save();
-
-            return response()->json(['message' => 'service added successfuly'], 200);
-
-        } catch (Exception $e) {
-            return response()->json(['error' => 'something went wrong!'], 500);
-        }
-     }
-
     /**
      * @SWG\Get(
      *     path="/api/stylist/my_services",
@@ -374,7 +549,7 @@ class SalonController extends Controller
      {
         try{
             $salonOwner  = $this->findStylistById(Auth::id());
-            $allServices =  Salon::findOrfail($salonOwner->salon_id)->service;
+            $allServices = Salon::findOrfail($salonOwner->salon_id)->service;
 
             return response()->json( ['allServices' => $allServices ], 200);
         } catch (Exception $e) {
@@ -404,7 +579,7 @@ class SalonController extends Controller
     {
        try{
            $salonOwner  = $this->findStylistById(Auth::id());
-           $service     =  Services::where('salon_id', $salonOwner->salon_id)
+           $service     = Services::where('salon_id', $salonOwner->salon_id)
                                    ->where('id',$id);
 
            $service->delete();
@@ -437,7 +612,7 @@ class SalonController extends Controller
     {
        try{
            $service = Services::findOrfail($id);
-
+           
            return response()->json(['service' => $service] , 200);
        } catch (Exception $e) {
            return response()->json(['error' => 'something went wrong!'], 500);
@@ -455,13 +630,6 @@ class SalonController extends Controller
      *         name="name",
      *         in="path",
      *         description="name",
-     *         required=true,
-     *         type="string",
-     *     ),
-     *     @SWG\Parameter(
-     *         name="price",
-     *         in="path",
-     *         description="price",
      *         required=true,
      *         type="string",
      *     ),
@@ -492,7 +660,6 @@ class SalonController extends Controller
         $validator =  Validator::make(
             $request->all() ,[
              'name'       => 'required',
-             'price'      => 'required',
              ]);
 
         try {
@@ -505,7 +672,6 @@ class SalonController extends Controller
             $service       =  Services::where('salon_id', $salonOwner->salon_id)
                                     ->where('id',$id);
             $service->name  = $request->name;
-            $service->price = $request->price;
 
             return response()->json(['service' => $service, 'message' => 'service updateed'] , 200);
        } catch (Exception $e) {
@@ -610,23 +776,178 @@ class SalonController extends Controller
      *         @SWG\Schema(ref="#/definitions/Salon"),
      *     ),
      *     @SWG\Response(
-     *         response="404",
-     *         description="This password reset token is invalid..",
+     *         response="500",
+     *         description="something went wrong!",
      *     ),
      * )
      */
     public function findSalon($id)
     {
-
         try{
-            $salon = Salon::findOrfail($id);
+            $salonOwner                     = Stylist::where('salon_id', $id)->first();
+            $mySalon                        = Salon::find($id);
+            $images                         = json_decode($mySalon->images);
+            $path                           = public_path().'/uploads/salon/'. $salonOwner->user_id .'/';
+            $mySalon['services']            = Salon::find($id)->service;
+            $mySalon['menu']                = Salon::find($id)->menu;
+            $workTimes                      = Salon::find($id)->workTime;
 
-            if (!$salon) {
+            if ($workTimes) { 
+                $mySalon['workingTimes']    = [
+                                                'monday'    => json_decode($workTimes->monday),
+                                                'tuesday'   => json_decode($workTimes->tuesday),
+                                                'wednesday' => json_decode($workTimes->wednesday),
+                                                'thursday'  => json_decode($workTimes->thursday),
+                                                'friday'    => json_decode($workTimes->friday),
+                                                'saturday'  => json_decode($workTimes->saturday),
+                                                'sunday'    => json_decode($workTimes->sunday),
+                                             ];
+            }
+               
+            $salonEmployee                  = Salon::find($id)->beautyPro;
 
-                return response()->json(['salon not found'], 404);
+            if (count($salonEmployee)){
+                foreach ($salonEmployee as $pro  )  {
+                    $beautyPro[] = User::find($pro->id);
+                }
+                $mySalon['beautyProfessionals'] = $beautyPro;
+            } else {
+                $mySalon['beautyProfessionals'] = 'No Beauty Pro Found';
+            }
+           
+
+            if ($images) {
+                foreach($images as $image) {
+                    $allImages[] = $path . $image;
+                }
+                $mySalon['images'] = $allImages;    
+
+            } else {
+                $mySalon['images'] = 'no images';
+            }
+            
+            return response()->json(['salon' => $mySalon], 200);
+        } catch (Exception $e) {
+            return response()->json(['error' => 'something went wrong!'], 500);
+        }
+    }
+
+
+    public function workingDaysCreate($workModel ,$request, $salonId)
+    {
+        $workModel->salon_id = $salonId;
+
+        if ($request->monday) {
+            $workModel->monday = json_encode($request->monday);
+        }
+
+        if ($request->tuesday) {
+            $workModel->tuesday = json_encode($request->tuesday);
+        }
+
+        if ($request->wednesday) {
+            $workModel->wednesday = json_encode($request->wednesday);
+        }
+
+        if ($request->thursday) {
+            $workModel->thursday = json_encode($request->thursday);
+        }
+
+        if ($request->friday) {
+            $workModel->friday = json_encode($request->friday);
+        }
+
+        if ($request->saturday) {
+            $workModel->saturday = json_encode($request->saturday);
+        }
+
+        if ($request->sunday) {
+            $workModel->sunday = json_encode($request->sunday);
+        }
+
+        $workModel->save();
+
+        $times['monday']    = json_decode($workModel->monday);
+        $times['tuesday']   = json_decode($workModel->tuesday);
+        $times['wednesday'] = json_decode($workModel->wednesday);
+        $times['thursday']  = json_decode($workModel->thursday);
+        $times['friday']    = json_decode($workModel->friday);
+        $times['saturday']  = json_decode($workModel->saturday);
+        $times['sunday']    = json_decode($workModel->sunday);
+
+        $this->workingTimes = $times;
+    }
+    /**
+     * @SWG\Get(
+     *     path="/api/show_my_beauty_pro",
+     *     summary="show my salons's beauty pro",
+     *     tags={"Salon"},
+     *     description="show my salons's beauty pro workers",
+     *     @SWG\Response(
+     *         response=200,
+     *         description="return json beautyProfessionals list for your salon"
+     *     ),
+     *     @SWG\Response(
+     *         response="500",
+     *         description="something went wrong",
+     *     ),
+     * )
+     */
+    public function showMyBeautyPro()
+    {
+        try{
+            $stylist       = $this->findStylistById(Auth::id());
+            $salonEmployee = Salon::find($stylist->salon_id)->beautyPro;
+
+            if (count($salonEmployee)){
+                foreach ($salonEmployee as $pro  )  {
+                    $beautyPro[] = User::find($pro->id);
+                }
+                $beautyProfessionals = $beautyPro;
+            } else {
+                $beautyProfessionals = 'No Beauty Pro Found';
             }
 
-            return response()->json($salon, 200);
+            return response()->json(['beautyProfessionals' => $beautyProfessionals], 200);
+        } catch (Exception $e) {
+            return response()->json(['error' => 'something went wrong!'], 500);
+        }
+    }
+
+    /**
+     * @SWG\Get(
+     *     path="/api/salon/exclude/{beauty_pro_id}",
+     *     summary="ecxlude salon's beauty professional",
+     *     tags={"Salon"},
+     *     description="ecxlude salon's beauty professional",
+     *     @SWG\Response(
+     *         response=200,
+     *         description="return json beautyProfessionals list for your salon",
+     *     ),
+     *     @SWG\Response(
+     *         response="404",
+     *         description="user not found",
+     *     ),
+     *     @SWG\Response(
+     *         response="500",
+     *         description="something went wrong!",
+     *     ),
+     * )
+     */
+    public function deleteMyBeautyPro($id)
+    {
+        try{
+            $stylist       = $this->findStylistById(Auth::id());
+            $salonEmployee = SalonEmployee::where('salon_id',$stylist->salon_id)
+                                            ->where('stylist_id',$id)->delete();
+            if ($salonEmployee) {
+
+                return response()->json(['message'=>'BeautyPro Excluded'], 200);
+            } else {
+
+                return response()->json(['message'=>'user not found'], 422);
+            }
+
         } catch (Exception $e) {
             return response()->json(['error' => 'something went wrong!'], 500);
         }

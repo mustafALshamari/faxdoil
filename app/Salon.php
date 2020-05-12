@@ -57,4 +57,19 @@ class Salon extends Model
     {
         return $this->hasMany('App\Services');
     }
+
+    public function workTime()
+    {
+        return $this->hasOne('App\SalonWorkTime');
+    }
+
+    public function beautyPro()
+    {
+        return $this->hasMany('App\SalonEmployee');
+    }
+
+    public function menu()
+    {
+        return $this->hasMany('App\SalonMenu');
+    }
 }
