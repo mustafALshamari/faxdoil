@@ -315,6 +315,124 @@
                         "description": "images max 10 pieces",
                         "required": false,
                         "type": "string"
+                    },
+                    {
+                        "name": "service_name[]",
+                        "in": "path",
+                        "description": "service_name",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "item_name[]",
+                        "in": "path",
+                        "description": "item_name",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "item_price[]",
+                        "in": "path",
+                        "description": "item_price",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "working_days[]",
+                        "in": "path",
+                        "description": "working_days and time object",
+                        "required": false,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation message "
+                    },
+                    "422": {
+                        "description": "validation error"
+                    },
+                    "500": {
+                        "description": "error something went wrong"
+                    }
+                },
+                "security": [
+                    {
+                        "passport": []
+                    }
+                ]
+            }
+        },
+        "/api/stylist/updata_salon": {
+            "post": {
+                "tags": [
+                    "Salon"
+                ],
+                "summary": "create salon",
+                "description": "create salon and if exist , then you can update it using this API",
+                "parameters": [
+                    {
+                        "name": "name",
+                        "in": "path",
+                        "description": "salon's name",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "location",
+                        "in": "path",
+                        "description": "location",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "latitude",
+                        "in": "path",
+                        "description": "latitude",
+                        "required": false,
+                        "type": "number"
+                    },
+                    {
+                        "name": "longitude",
+                        "in": "path",
+                        "description": "longitude",
+                        "required": false,
+                        "type": "number"
+                    },
+                    {
+                        "name": "images[]",
+                        "in": "path",
+                        "description": "images max 10 pieces",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "service_name[]",
+                        "in": "path",
+                        "description": "service_name",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "item_name[]",
+                        "in": "path",
+                        "description": "item_name",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "item_price[]",
+                        "in": "path",
+                        "description": "item_price",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "working_days[]",
+                        "in": "path",
+                        "description": "working_days and time object",
+                        "required": false,
+                        "type": "string"
                     }
                 ],
                 "responses": {
@@ -341,10 +459,10 @@
                     "Salon"
                 ],
                 "summary": "show salon info",
-                "description": "get salon info like name,images ,address for owner 'stylist'",
+                "description": "get salon info like name,images ,address , services ,for owner 'stylist'",
                 "responses": {
                     "200": {
-                        "description": "salon full info and images",
+                        "description": "salon full info and images , beauty pro and working times",
                         "schema": {
                             "$ref": "#/definitions/Salon"
                         }
@@ -407,50 +525,6 @@
                         "schema": {
                             "$ref": "#/definitions/Salon"
                         }
-                    },
-                    "500": {
-                        "description": "error something went wrong"
-                    }
-                },
-                "security": [
-                    {
-                        "passport": []
-                    }
-                ]
-            }
-        },
-        "/api/stylist/add_service": {
-            "post": {
-                "tags": [
-                    "Salon"
-                ],
-                "summary": "add service to salon",
-                "description": "add services",
-                "parameters": [
-                    {
-                        "name": "name",
-                        "in": "path",
-                        "description": "name",
-                        "required": true,
-                        "type": "string"
-                    },
-                    {
-                        "name": "price",
-                        "in": "path",
-                        "description": "price",
-                        "required": true,
-                        "type": "string"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "service added successfuly",
-                        "schema": {
-                            "$ref": "#/definitions/Services"
-                        }
-                    },
-                    "422": {
-                        "description": "validation error"
                     },
                     "500": {
                         "description": "error something went wrong"
@@ -636,8 +710,45 @@
                             "$ref": "#/definitions/Salon"
                         }
                     },
+                    "500": {
+                        "description": "something went wrong!"
+                    }
+                }
+            }
+        },
+        "/api/show_my_beauty_pro": {
+            "get": {
+                "tags": [
+                    "Salon"
+                ],
+                "summary": "show my salons's beauty pro",
+                "description": "show my salons's beauty pro workers",
+                "responses": {
+                    "200": {
+                        "description": "return json beautyProfessionals list for your salon"
+                    },
+                    "500": {
+                        "description": "something went wrong"
+                    }
+                }
+            }
+        },
+        "/api/salon/exclude/{beauty_pro_id}": {
+            "get": {
+                "tags": [
+                    "Salon"
+                ],
+                "summary": "ecxlude salon's beauty professional",
+                "description": "ecxlude salon's beauty professional",
+                "responses": {
+                    "200": {
+                        "description": "return json beautyProfessionals list for your salon"
+                    },
                     "404": {
-                        "description": "This password reset token is invalid.."
+                        "description": "user not found"
+                    },
+                    "500": {
+                        "description": "something went wrong!"
                     }
                 }
             }
@@ -1220,13 +1331,61 @@
                 }
             }
         },
+        "SalonEmployee": {
+            "properties": {
+                "salon_id": {
+                    "type": "string"
+                },
+                "stylist_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "SalonMenu": {
+            "properties": {
+                "integer": {
+                    "type": "string"
+                },
+                "stylist_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "SalonWorkTime": {
+            "properties": {
+                "salon_id": {
+                    "type": "id"
+                },
+                "monday": {
+                    "type": "string"
+                },
+                "tuesday": {
+                    "type": "string"
+                },
+                "wednesday": {
+                    "type": "string"
+                },
+                "thursday": {
+                    "type": "string"
+                },
+                "friday": {
+                    "type": "string"
+                },
+                "saturday": {
+                    "type": "string"
+                },
+                "sunday": {
+                    "type": "string"
+                }
+            }
+        },
         "Services": {
             "properties": {
                 "name": {
                     "type": "string"
                 },
-                "price": {
-                    "type": "string"
+                "salon_id": {
+                    "type": "integer"
                 }
             }
         },
@@ -1357,9 +1516,9 @@
             "scheme": "https",
             "flows": {
                 "password": {
-                    "authorizationUrl": "http://localhost:8200/oauth/authorize",
-                    "tokenUrl": "http://localhost:8200/oauth/token",
-                    "refreshUrl": "http://localhost:8200/token/refresh",
+                    "authorizationUrl": "http://localhost/oauth/authorize",
+                    "tokenUrl": "http://localhost/oauth/token",
+                    "refreshUrl": "http://localhost/token/refresh",
                     "scopes": []
                 }
             }
