@@ -73,5 +73,9 @@ use Illuminate\Http\Request;
     //for admin
     Route::group(['prefix'=>'admin'], function () {
         Route::post('register', 'Admin\AuthController@register');
+        //  Articles
+        Route::post('add_article', 'Admin\ArticlesController@addArticle');
+        Route::get('show_article', 'Admin\ArticlesController@showArticle');
+        Route::post('update_article/{article}', 'Admin\ArticlesController@updateArticle');
     });
 
