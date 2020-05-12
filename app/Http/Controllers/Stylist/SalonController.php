@@ -19,7 +19,6 @@ use Exception;
 use DB;
 use Auth;
 use File;
-use ProfileController;
 
 class SalonController extends Controller
 {
@@ -158,7 +157,7 @@ class SalonController extends Controller
             }
 
             $salon->save();
-            
+
             $stylist           = $this->findStylistById(Auth::id());
             $stylist->salon_id = $salon->id;
             $stylist->save();
@@ -171,7 +170,7 @@ class SalonController extends Controller
                     $serviceModel->save();
                }
             }
-            
+
            $services = Salon::find($salon->id)->service;
 
            if ($request->item_name) {
@@ -184,14 +183,14 @@ class SalonController extends Controller
                   $menu =  SalonMenu::insert($dataForMenu);
                }
             }
-           
-           $workModel = new SalonWorkTime();  
+
+           $workModel = new SalonWorkTime();
            $this->workingDaysCreate($workModel ,$request, $salon->id);
 
             return response()->json(['success'        => 'successfully created your salon',
                                       'salon'         => $salon,
                                       'services'      => $services,
-                                      'salon_time'    => $this->workingTimes], 
+                                      'salon_time'    => $this->workingTimes],
                                       200);
         } catch (Exception $e) {
             return response()->json(['error' => 'something went wrong!'], 500);
@@ -363,7 +362,7 @@ class SalonController extends Controller
             }
 
             $removeService = SalonWorkTime::where('salon_id', $stylist->salon_id)->delete();
-            $workModel      = new SalonWorkTime();  
+            $workModel      = new SalonWorkTime();
             $this->workingDaysCreate($workModel ,$request, $salon->id);
 
             return response()->json(['success' => 'successfully updated your salon',
@@ -402,8 +401,8 @@ class SalonController extends Controller
             $mySalon['menu']                = Salon::find($salonOwner->salon_id)->menu;
             $workTimes                      = Salon::find($salonOwner->salon_id)->workTime;
 
-            if ($workTimes) { 
-                $mySalon['workingTimes']    = 
+            if ($workTimes) {
+                $mySalon['workingTimes']    =
                 [
                 'monday'    => json_decode($workTimes->monday),
                 'tuesday'   => json_decode($workTimes->tuesday),
@@ -414,7 +413,7 @@ class SalonController extends Controller
                 'sunday'    => json_decode($workTimes->sunday),
                  ];
             }
-               
+
             $salonEmployee                  = Salon::find($salonOwner->salon_id)->beautyPro;
 
             if (count($salonEmployee)){
@@ -425,18 +424,18 @@ class SalonController extends Controller
             } else {
                 $mySalon['beautyProfessionals'] = 'No Beauty Pro Found';
             }
-           
+
 
             if ($images) {
                 foreach($images as $image) {
                     $allImages[] = $path . $image;
                 }
-                $mySalon['images'] = $allImages;    
+                $mySalon['images'] = $allImages;
 
             } else {
                 $mySalon['images'] = 'no images';
             }
-            
+
             return response()->json(['salon' => $mySalon], 200);
         } catch (Exception $e) {
             return response()->json(['error' => 'something went wrong!'], 500);
@@ -612,7 +611,7 @@ class SalonController extends Controller
     {
        try{
            $service = Services::findOrfail($id);
-           
+
            return response()->json(['service' => $service] , 200);
        } catch (Exception $e) {
            return response()->json(['error' => 'something went wrong!'], 500);
@@ -792,7 +791,7 @@ class SalonController extends Controller
             $mySalon['menu']                = Salon::find($id)->menu;
             $workTimes                      = Salon::find($id)->workTime;
 
-            if ($workTimes) { 
+            if ($workTimes) {
                 $mySalon['workingTimes']    = [
                                                 'monday'    => json_decode($workTimes->monday),
                                                 'tuesday'   => json_decode($workTimes->tuesday),
@@ -803,7 +802,7 @@ class SalonController extends Controller
                                                 'sunday'    => json_decode($workTimes->sunday),
                                              ];
             }
-               
+
             $salonEmployee                  = Salon::find($id)->beautyPro;
 
             if (count($salonEmployee)){
@@ -814,18 +813,18 @@ class SalonController extends Controller
             } else {
                 $mySalon['beautyProfessionals'] = 'No Beauty Pro Found';
             }
-           
+
 
             if ($images) {
                 foreach($images as $image) {
                     $allImages[] = $path . $image;
                 }
-                $mySalon['images'] = $allImages;    
+                $mySalon['images'] = $allImages;
 
             } else {
                 $mySalon['images'] = 'no images';
             }
-            
+
             return response()->json(['salon' => $mySalon], 200);
         } catch (Exception $e) {
             return response()->json(['error' => 'something went wrong!'], 500);
@@ -951,5 +950,5 @@ class SalonController extends Controller
         } catch (Exception $e) {
             return response()->json(['error' => 'something went wrong!'], 500);
         }
-    }
+     }
 }
