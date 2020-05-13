@@ -31,6 +31,7 @@ php_action () {
 		  'cache:clear'
 		  'view:clear'
 		  'route:cache'
+          'storage:link'
     )
 
     path_to_artisan="/var/www/api/artisan"

@@ -222,19 +222,19 @@ class UserProfileController extends Controller
             $user->introduction = $request->introduction;
         }
 
-        if ($request->hasFile("profile_photo")) {
-            $photo               = $request->profile_photo;
-            $profilePhotoName  = time(). '.' .$request->profile_photo->extension();
-            $photo->move(public_path('uploads/account/' . $user->id), $profilePhotoName);
-            $user->profile_photo = public_path('uploads/account/' . $user->id) . $profilePhotoName;
-        }
+//        if ($request->hasFile("profile_photo")) {
+//            $photo               = $request->profile_photo;
+//            $profilePhotoName  = time(). '.' .$request->profile_photo->extension();
+//            $photo->move(public_path('uploads/account/' . $user->id), $profilePhotoName);
+//            $user->profile_photo = public_path('uploads/account/' . $user->id) . $profilePhotoName;
+//        }
 
-        if ($request->hasFile("background_photo")) {
-            $photo            = $request->background_photo;
-            $backgroundPhotoName   = time(). '.' .$request->background_photo->extension();
-            $photo->move(public_path('uploads/account/' . $user->id), $backgroundPhotoName);
-            $user->background_photo = public_path('uploads/account/' . $user->id) . $backgroundPhotoName;
-        }
+//        if ($request->hasFile("background_photo")) {
+//            $photo            = $request->background_photo;
+//            $backgroundPhotoName   = time(). '.' .$request->background_photo->extension();
+//            $photo->move(public_path('uploads/account/' . $user->id), $backgroundPhotoName);
+//            $user->background_photo = public_path('uploads/account/' . $user->id) . $backgroundPhotoName;
+//        }
 
         if ($request->location) {
             foreach ($request->location as $key => $value) {
@@ -256,6 +256,11 @@ class UserProfileController extends Controller
             $user->whats_app = $request->whats_app;
         }
 
+        $user->save();
+
+        $this->storeProfilePhoto($user);
+        $this->storeBackgroundPhoto($user);
+
         $data['username']           = $user->username;
         $data['email']              = $user->email;
         $data['fullname']           = $user->fullname;
@@ -268,12 +273,28 @@ class UserProfileController extends Controller
         $data['longitude']          = $user->longitude;
         $data['whats_app']          = $user->whats_app;
 
-        $user->save();
-
         return response()->json([
             'data'    => $data,
             'status'  => 'success',
             'message' => 'The profile has been updated successfully'
         ]);
+    }
+
+    private function storeProfilePhoto($user)
+    {
+        if (request()->has('profile_photo')) {
+            $user->update([
+                'profile_photo' => 'storage/' . request()->profile_photo->store('uploads/accounts/profiles', 'public'),
+            ]);
+        }
+    }
+
+    private function storeBackgroundPhoto($user)
+    {
+        if (request()->has('background_photo')) {
+            $user->update([
+                'background_photo' => 'storage/' . request()->background_photo->store('uploads/accounts/background', 'public'),
+            ]);
+        }
     }
 }
