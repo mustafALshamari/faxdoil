@@ -133,7 +133,7 @@ class User extends Authenticatable
         return $this->hasMany('App\StylistReview');
     }
 
-    function PostLike()
+    function postLike()
     {
         return $this->hasMany('App\PostLike');
     }

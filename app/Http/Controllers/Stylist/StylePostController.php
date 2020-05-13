@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Stylist;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\User;
+use App\Report;
 use App\Salon;
 use App\Stylist;
 use App\StylePost;
@@ -12,6 +13,7 @@ use App\PostLike;
 use App\PostComment;
 use Validator;
 use Exception;
+use Session;
 use DB;
 use Auth;
 use File;
@@ -174,7 +176,6 @@ class StylePostController extends Controller
      *     tags={"StylePost"},
      *     description="delete style post'",
      *     security={{"passport": {}}},
- 
      *     @SWG\Response(
      *         response=200,
      *         description="Post has been deleted'",
@@ -184,7 +185,6 @@ class StylePostController extends Controller
      *         response="500",
      *         description="error something went wrong",
      *     ),
-     * 
      * )
      */
     public function deletePost($id)
@@ -206,12 +206,11 @@ class StylePostController extends Controller
 
     /**
      * @SWG\Get(
-     *     path="/api/stylist/show_all_post",
+     *     path="/api/stylist/show_my_posts",
      *     summary="show all post for stylist",
      *     tags={"StylePost"},
      *     description="delete some style post'",
      *     security={{"passport": {}}},
- 
      *     @SWG\Response(
      *         response=200,
      *         description="show all post for stylist",
@@ -227,9 +226,26 @@ class StylePostController extends Controller
     public function showAllPosts()
     {
         try {
-            $stylePost = StylePost::all();
-            
-                return response()->json(['stylePosts' => $stylePost] , 200);
+            $stylist     = Stylist::where('user_id',Auth::id())->first();
+            $auther      = User::find($stylist->user_id)
+                            ->makeHidden(
+                            ['email',
+                            'email_verified_at',
+                            'age',
+                            'created_at',
+                            'updated_at',
+                            'introduction']
+                            );
+            $showAllPost = Stylist::find($stylist->id)->stylePost;
+               
+            foreach ($showAllPost as $post ){
+                $data[] = [
+                            'post'   => $post,
+                            'auther' => $auther
+                          ];
+            }
+
+            return response()->json(['showAllPost'  => $data] , 200);
         } catch (Exception $e) {
             return response()->json(['error' => 'something went wrong!'], 500);
         }
@@ -242,7 +258,6 @@ class StylePostController extends Controller
      *     tags={"StylePost"},
      *     description="show some style post'",
      *     security={{"passport": {}}},
- 
      *     @SWG\Response(
      *         response=200,
      *         description="show specific post object for stylist ",
@@ -252,14 +267,16 @@ class StylePostController extends Controller
      *         response="500",
      *         description="error something went wrong",
      *     ),
-     * 
      * )
      */
     public function showPost($id)
     {
         try {
-            $stylePost             = StylePost::findOrfail($id);
-            $stylePost['author']   = User::findOrfail($stylePost->stylist_id)
+            $stylePost = StylePost::findOrfail($id);
+            $stylePost->Increment('views');
+    
+            $stylist               = Stylist::findOrfail($stylePost->stylist_id);
+            $stylePost['author']   = User::findOrfail($stylist->user_id)
                                          ->makeHidden(
                                             ['email',
                                             'email_verified_at',
@@ -268,14 +285,23 @@ class StylePostController extends Controller
                                             'updated_at',
                                             'introduction']
                                             );
-            $stylePost['likes']    = count(PostLike::where('post_id' ,$id)->get());
+            $stylePost['likes']    = count(PostLike::where('style_post_id' ,$id)->get());
             $stylePost['comments'] = DB::table('post_comments')
                                         ->join('users','post_comments.user_id','=','users.id')
                                         ->select('username','comment','post_comments.created_at'
                                         ,'profile_photo','post_comments.updated_at','post_comments.style_post_id')
                                         ->where('post_comments.style_post_id', '=' , $id)
+                                        ->latest()
                                         ->get();
-            $stylePost['views']    = '0';
+            $stylePost['views']    = $stylePost->views ;
+
+            $path    = public_path().'/uploads/style_post/'. $stylist->user_id .'/';
+
+            foreach(json_decode($stylePost->media) as $image) {
+                $postmedia[] = $path . $image;
+            }
+
+            $stylePost['media']    = $postmedia;
 
             if ($stylePost){
                 return response()->json(['post' => $stylePost] , 200);
@@ -339,7 +365,6 @@ class StylePostController extends Controller
      *         response=200,
      *         description="successful operation",
      *         @SWG\Schema(ref="#/definitions/StylePost")
-     *      
      *     ),
      *     @SWG\Response(
      *         response="422",
@@ -349,7 +374,6 @@ class StylePostController extends Controller
      *         response="500",
      *         description="error something went wrong",
      *     ),
-     * 
      * )
      */
     public function updateStylePost(Request $request , $id)
@@ -424,6 +448,255 @@ class StylePostController extends Controller
                File::delete($path);
            }
 
+       } catch (Exception $e) {
+           return response()->json(['error' => 'something went wrong!'], 500);
+       }
+    }
+
+     /**
+     * @SWG\Post(
+     *     path="/api/stylist/put_like/{post_id}",
+     *     summary="like style post",
+     *     tags={"StylePost"},
+     *     description="like style post",
+     *     security={{"passport": {}}},
+     *     @SWG\Parameter(
+     *         name="post_id",
+     *         in="path",
+     *         description="post_id",
+     *         required=true,
+     *         type="integer",
+     *     ),
+     *     @SWG\Response(
+     *         response=200,
+     *         description="You just liked that, if liked then you unlike",
+     *         @SWG\Schema(ref="#/definitions/StylePost")
+     *     ),
+     *     @SWG\Response(
+     *         response="500",
+     *         description="error something went wrong",
+     *     ),
+     * )
+     */
+    public function putLikeToPost($post_id)
+    {
+        try {
+            $post = StylePost::findOrfail($post_id);
+            $like = PostLike::where('style_post_id',$post->id)
+                                        ->where('user_id', Auth::id())->first();
+            if ($like) {
+                $this->unlikePost($post_id);
+
+                return response()->json(['message' => 'Unliked']);
+            } else {
+                $putLike                = new PostLike();
+                $putLike->user_id       = Auth::id();
+                $putLike->style_post_id = $post->id;
+
+                $putLike->save();
+
+                return response()->json([
+                    'message'   => 'You just liked that',
+                    'like info' => $putLike] , 200);
+            }
+
+        } catch (Exception $e) {
+            return response()->json(['error' => 'something went wrong!'], 500);
+        }    
+    }
+
+  
+    public function unlikePost($post_id)
+    {
+        try {
+            $post = StylePost::findOrfail($post_id);
+            $like = PostLike::where('style_post_id', $post->id)
+                            ->where('user_id', Auth::id())->delete();
+        } catch (Exception $e) {
+            return response()->json(['error' => 'something went wrong!'], 500);
+        }    
+    }
+
+    /**
+     * @SWG\Post(
+     *     path="/api/stylist/report_post/{post_id}",
+     *     summary="dislike style post",
+     *     tags={"StylePost"},
+     *     description="dislike style post",
+     *     security={{"passport": {}}},
+     *     @SWG\Parameter(
+     *         name="report",
+     *         in="path",
+     *         description="report content",
+     *         required=true,
+     *         type="string",
+     *     ),
+     *     @SWG\Response(
+     *         response=200,
+     *         description="Thanks, We will check your report as soon as possible",
+     *         @SWG\Schema(ref="#/definitions/StylePost")
+     *     ),
+     *     @SWG\Response(
+     *         response="500",
+     *         description="error something went wrong",
+     *     ),
+     * )
+     */
+    public function reportPost(Request $request , $post_id)
+    { 
+        $validator =  Validator::make(
+        $request->all() ,[
+        'report'     => 'required',
+        ]);
+
+        try {
+            if ($validator->fails()) {
+                return response()->json(['error' => $validator->errors()],401);
+            }
+
+            $post                       = StylePost::findOrfail($post_id);
+            $reportModel                = new Report();
+            $reportModel->user_id       = Auth::id();
+            $reportModel->style_post_id = $post->id;
+            $reportModel->report        = $request->report;
+
+            $reportModel->save();
+
+            return response()->json([
+                'message' => 'Thanks, We will check your report as soon as possible'] , 200);
+        } catch (Exception $e) {
+            return response()->json(['error' => 'something went wrong!'], 500);
+        }    
+    }
+
+     /**
+     * @SWG\Post(
+     *     path="/api/stylist/create_comment/{post_id}",
+     *     summary="create style post comment",
+     *     tags={"StylePost"},
+     *     description="create style post comment",
+     *     security={{"passport": {}}},
+     *     @SWG\Parameter(
+     *         name="comment",
+     *         in="path",
+     *         description="your comment ",
+     *         required=true,
+     *         type="string",
+     *     ),
+     *     @SWG\Response(
+     *         response=200,
+     *         description="Your comment was submitted",
+     *         @SWG\Schema(ref="#/definitions/StylePost")
+     *     ),
+     *     @SWG\Response(
+     *         response="500",
+     *         description="error something went wrong",
+     *     ),
+     * )
+     */
+    public function createComment(Request $request , $post_id)
+    {
+        $validator =  Validator::make(
+            $request->all() ,[
+            'comment'     => 'required',
+            ]);
+
+        try {
+            if ($validator->fails()) {
+                return response()->json(['error' => $validator->errors()],401);
+            }
+            $post    = StylePost::findOrfail($post_id);
+
+            $postComment                = new PostComment();
+            $postComment->user_id       = Auth::id();
+            $postComment->style_post_id = $post->id;
+            $postComment->comment       = $request->comment;
+
+            $postComment->save();
+
+            return response()->json([
+                'message'   => 'Your comment was submitted',
+                'comment info' => $postComment] , 200);
+        } catch (Exception $e) {
+            return response()->json(['error' => 'something went wrong!'], 500);
+        }    
+    }
+
+     /**
+     * @SWG\Post(
+     *     path="/api/stylist/update_comment/{id}",
+     *     summary="like style post",
+     *     tags={"StylePost"},
+     *     description="like style post",
+     *    @SWG\Parameter(
+     *         name="comment",
+     *         in="path",
+     *         description="your comment",
+     *         required=true,
+     *         type="string",
+     *     ),
+     *     @SWG\Response(
+     *         response=200,
+     *         description="Your comment was updated",
+     *         @SWG\Schema(ref="#/definitions/StylePost")
+     *     ),
+     *     @SWG\Response(
+     *         response="500",
+     *         description="error something went wrong",
+     *     ),
+     * )
+     */
+    public function updateComment(Request $request , $id)
+    {
+        $validator =  Validator::make(
+            $request->all() ,[
+            'comment'     => 'required',
+            ]);
+
+        try {
+            if ($validator->fails()) {
+                return response()->json(['error' => $validator->errors()],401);
+            }
+            $comment                = PostComment::findOrfail($id);
+            $comment->user_id       = Auth::id();
+            $comment->comment       = $request->comment;
+
+            $comment->save();
+
+            return response()->json([
+                'message'   => 'Your comment was updated',
+                'comment info' => $comment] , 200);
+        } catch (Exception $e) {
+            return response()->json(['error' => 'something went wrong!'], 500);
+        }    
+    }
+
+    /**
+     * @SWG\Get(
+     *     path="/api/stylist/delete_comment/{id}'",
+     *     summary="show specific post for stylist",
+     *     tags={"StylePost"},
+     *     description="delete comment by id",
+     *     security={{"passport": {}}},
+     *     @SWG\Response(
+     *         response=200,
+     *         description="Your comment was deleted",
+     *         @SWG\Schema(ref="#/definitions/StylePost"),
+     *     ),
+     *     @SWG\Response(
+     *         response="500",
+     *         description="error something went wrong",
+     *     ),
+     * )
+     */
+    public function deleteComment($id)
+    {
+       try{
+           $comment = PostComment::findOrfail($id);
+           $comment->delete();
+
+           return response()->json([
+                'message'   => 'Your comment was deleted'] , 200);
        } catch (Exception $e) {
            return response()->json(['error' => 'something went wrong!'], 500);
        }

@@ -53,7 +53,7 @@ use Illuminate\Http\Request;
             Route::get('show_my_salon', 'Stylist\SalonController@showMysalon');
             Route::get('show_my_location', 'Stylist\SalonController@showMyLocation');
             Route::get('salon/show_my_beauty_pro', 'Stylist\SalonController@showMyBeautyPro');
-            Route::get('salon/exclude/{beauty_pro_id}', 'Stylist\SalonController@deleteMyBeautyPro');
+            Route::get('salon/exclude/{username}', 'Stylist\SalonController@deleteMyBeautyPro');
             Route::post('salon/invite', 'Stylist\SalonController@sendInvitation');
             //services
             Route::get('my_services', 'Stylist\SalonController@listServices');
@@ -63,9 +63,17 @@ use Illuminate\Http\Request;
             //postStyile
             Route::post('make_style_post', 'Stylist\StylePostController@createStylePost');
             Route::get('delete_post/{id}', 'Stylist\StylePostController@deletePost');
-            Route::get('show_all_post', 'Stylist\StylePostController@showAllPosts');
+            Route::get('show_my_posts', 'Stylist\StylePostController@showAllPosts');
             Route::get('show_post/{id}', 'Stylist\StylePostController@showPost');
             Route::post('update_post/{id}', 'Stylist\StylePostController@updateStylePost');
+            //post put like
+            Route::post('put_like/{post_id}', 'Stylist\StylePostController@putLikeToPost');
+            //post report
+            Route::post('report_post/{post_id}', 'Stylist\StylePostController@reportPost');
+            //comment
+            Route::post('create_comment/{post_id}', 'Stylist\StylePostController@createComment');
+            Route::post('update_comment/{id}', 'Stylist\StylePostController@updateComment');
+            Route::get('delete_comment/{id}', 'Stylist\StylePostController@deleteComment');
         });
     });
 

@@ -324,16 +324,9 @@
                         "type": "string"
                     },
                     {
-                        "name": "item_name[]",
+                        "name": "item[]",
                         "in": "path",
-                        "description": "item_name",
-                        "required": false,
-                        "type": "string"
-                    },
-                    {
-                        "name": "item_price[]",
-                        "in": "path",
-                        "description": "item_price",
+                        "description": "item array has item_name and item_price",
                         "required": false,
                         "type": "string"
                     },
@@ -414,16 +407,9 @@
                         "type": "string"
                     },
                     {
-                        "name": "item_name[]",
+                        "name": "item[]",
                         "in": "path",
-                        "description": "item_name",
-                        "required": false,
-                        "type": "string"
-                    },
-                    {
-                        "name": "item_price[]",
-                        "in": "path",
-                        "description": "item_price",
+                        "description": "item array has item_name and item_price",
                         "required": false,
                         "type": "string"
                     },
@@ -716,7 +702,7 @@
                 }
             }
         },
-        "/api/show_my_beauty_pro": {
+        "/api/salon/show_my_beauty_pro": {
             "get": {
                 "tags": [
                     "Salon"
@@ -847,7 +833,7 @@
                 ]
             }
         },
-        "/api/stylist/show_all_post": {
+        "/api/stylist/show_my_posts": {
             "get": {
                 "tags": [
                     "StylePost"
@@ -957,6 +943,162 @@
                     },
                     "422": {
                         "description": "validation error"
+                    },
+                    "500": {
+                        "description": "error something went wrong"
+                    }
+                },
+                "security": [
+                    {
+                        "passport": []
+                    }
+                ]
+            }
+        },
+        "/api/stylist/put_like/{post_id}": {
+            "post": {
+                "tags": [
+                    "StylePost"
+                ],
+                "summary": "like style post",
+                "description": "like style post",
+                "parameters": [
+                    {
+                        "name": "post_id",
+                        "in": "path",
+                        "description": "post_id",
+                        "required": true,
+                        "type": "integer"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "You just liked that, if liked then you unlike",
+                        "schema": {
+                            "$ref": "#/definitions/StylePost"
+                        }
+                    },
+                    "500": {
+                        "description": "error something went wrong"
+                    }
+                },
+                "security": [
+                    {
+                        "passport": []
+                    }
+                ]
+            }
+        },
+        "/api/stylist/report_post/{post_id}": {
+            "post": {
+                "tags": [
+                    "StylePost"
+                ],
+                "summary": "dislike style post",
+                "description": "dislike style post",
+                "parameters": [
+                    {
+                        "name": "report",
+                        "in": "path",
+                        "description": "report content",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Thanks, We will check your report as soon as possible",
+                        "schema": {
+                            "$ref": "#/definitions/StylePost"
+                        }
+                    },
+                    "500": {
+                        "description": "error something went wrong"
+                    }
+                },
+                "security": [
+                    {
+                        "passport": []
+                    }
+                ]
+            }
+        },
+        "/api/stylist/create_comment/{post_id}": {
+            "post": {
+                "tags": [
+                    "StylePost"
+                ],
+                "summary": "create style post comment",
+                "description": "create style post comment",
+                "parameters": [
+                    {
+                        "name": "comment",
+                        "in": "path",
+                        "description": "your comment ",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Your comment was submitted",
+                        "schema": {
+                            "$ref": "#/definitions/StylePost"
+                        }
+                    },
+                    "500": {
+                        "description": "error something went wrong"
+                    }
+                },
+                "security": [
+                    {
+                        "passport": []
+                    }
+                ]
+            }
+        },
+        "/api/stylist/update_comment/{id}": {
+            "post": {
+                "tags": [
+                    "StylePost"
+                ],
+                "summary": "like style post",
+                "description": "like style post",
+                "parameters": [
+                    {
+                        "name": "comment",
+                        "in": "path",
+                        "description": "your comment",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Your comment was updated",
+                        "schema": {
+                            "$ref": "#/definitions/StylePost"
+                        }
+                    },
+                    "500": {
+                        "description": "error something went wrong"
+                    }
+                }
+            }
+        },
+        "/api/stylist/delete_comment/{id}'": {
+            "get": {
+                "tags": [
+                    "StylePost"
+                ],
+                "summary": "show specific post for stylist",
+                "description": "delete comment by id",
+                "responses": {
+                    "200": {
+                        "description": "Your comment was deleted",
+                        "schema": {
+                            "$ref": "#/definitions/StylePost"
+                        }
                     },
                     "500": {
                         "description": "error something went wrong"
@@ -1246,9 +1388,9 @@
                         "type": "string"
                     },
                     {
-                        "name": "nickname",
+                        "name": "fullname",
                         "in": "path",
-                        "description": "User nickname",
+                        "description": "User fullname",
                         "required": false,
                         "type": "string"
                     },
@@ -1334,7 +1476,7 @@
         "SalonEmployee": {
             "properties": {
                 "salon_id": {
-                    "type": "string"
+                    "type": "integer"
                 },
                 "stylist_id": {
                     "type": "integer"
@@ -1343,10 +1485,13 @@
         },
         "SalonMenu": {
             "properties": {
-                "integer": {
+                "item_name": {
                     "type": "string"
                 },
-                "stylist_id": {
+                "item_price": {
+                    "type": "string"
+                },
+                "salon_id": {
                     "type": "integer"
                 }
             }

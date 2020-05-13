@@ -23,6 +23,7 @@ use File;
 class SalonController extends Controller
 {
     protected $workingTimes;
+
     /**
      * @SWG\Post(
      *     path="/api/stylist/add_salon",
@@ -73,16 +74,9 @@ class SalonController extends Controller
      *         type="string",
      *     ),
      *    @SWG\Parameter(
-     *         name="item_name[]",
+     *         name="item[]",
      *         in="path",
-     *         description="item_name",
-     *         required=false,
-     *         type="string",
-     *     ),
-     *    @SWG\Parameter(
-     *         name="item_price[]",
-     *         in="path",
-     *         description="item_price",
+     *         description="item array has item_name and item_price",
      *         required=false,
      *         type="string",
      *     ),
@@ -115,8 +109,7 @@ class SalonController extends Controller
             'location'          => '',
             'images.*'          => 'mimes:jpg,jpeg,gif,png',
             'service_name'      => 'array',
-            'item_name'         => 'array',
-            'item_price'        => 'array'
+            'item'              => 'array',
         ]);
 
         try {
@@ -173,15 +166,15 @@ class SalonController extends Controller
 
            $services = Salon::find($salon->id)->service;
 
-           if ($request->item_name) {
-                foreach ( $request->item_name as $key => $value){
+           if ($request->item) {
+                foreach ( $request->item as $value){
                     $dataForMenu = [
-                        'item_name'  => $request->item_name[$key],
-                        'item_price' => $request->item_price[$key] ,
+                        'item_name'  => $value['item_name'],
+                        'item_price' => $value['item_price'] ,
                         'salon_id'   => $salon->id
                     ];
-                  $menu =  SalonMenu::insert($dataForMenu);
-               }
+                    $menu =  SalonMenu::insert($dataForMenu);
+                }
             }
 
            $workModel = new SalonWorkTime();
@@ -257,16 +250,9 @@ class SalonController extends Controller
      *         type="string",
      *     ),
      *    @SWG\Parameter(
-     *         name="item_name[]",
+     *         name="item[]",
      *         in="path",
-     *         description="item_name",
-     *         required=false,
-     *         type="string",
-     *     ),
-     *    @SWG\Parameter(
-     *         name="item_price[]",
-     *         in="path",
-     *         description="item_price",
+     *         description="item array has item_name and item_price",
      *         required=false,
      *         type="string",
      *     ),
@@ -299,9 +285,8 @@ class SalonController extends Controller
              'location'          => '',
              'images.*'          => 'mimes:jpg,jpeg,gif,png',
              'service_name'      => 'array',
-             'item_name'         => 'array',
-             'item_price'        => 'array',
-             'working_days'      =>''
+             'item'              => '',
+             'working_days'      => ''
          ]);
 
         try {
@@ -317,7 +302,7 @@ class SalonController extends Controller
             }
 
             if ($request->location) {
-                foreach ($request->location as  $value){
+                foreach ($request->location as $key => $value){
                     $salon->address    = $value['address'];
                     $salon->latitude   = $value['latitude'];
                     $salon->longitude  = $value['longitude'];
@@ -339,8 +324,8 @@ class SalonController extends Controller
             $removeService = Services::where('salon_id', $stylist->salon_id)->delete();
 
             if ($request->service_name) {
-                foreach($request->service_name as $service) {
-                    $sevicesModel   = new Services();
+                foreach ($request->service_name as $service) {
+                    $sevicesModel           = new Services();
                     $sevicesModel->name     = $service;
                     $sevicesModel->salon_id = $stylist->salon_id;
 
@@ -350,11 +335,11 @@ class SalonController extends Controller
 
             $removeService = SalonMenu::where('salon_id', $stylist->salon_id)->delete();
 
-            if ($request->item_name) {
-                foreach ( $request->item_name as $key => $value){
+            if ($request->item) {
+                foreach ( $request->item as $value){
                     $dataForMenu = [
-                        'item_name'  => $request->item_name[$key],
-                        'item_price' => $request->item_price[$key] ,
+                        'item_name'  => $value['item_name'],
+                        'item_price' => $value['item_price'] ,
                         'salon_id'   => $salon->id
                     ];
                   $menu =  SalonMenu::insert($dataForMenu);
@@ -632,13 +617,6 @@ class SalonController extends Controller
      *         required=true,
      *         type="string",
      *     ),
-     *     @SWG\Parameter(
-     *         name="price",
-     *         in="path",
-     *         description="price",
-     *         required=true,
-     *         type="string",
-     *     ),
      *     @SWG\Response(
      *         response=200,
      *         description="service updated successfuly",
@@ -669,7 +647,7 @@ class SalonController extends Controller
 
             $salonOwner    = $this->findStylistById(Auth::id());
             $service       =  Services::where('salon_id', $salonOwner->salon_id)
-                                    ->where('id',$id);
+                                      ->where('id',$id);
             $service->name  = $request->name;
 
             return response()->json(['service' => $service, 'message' => 'service updateed'] , 200);
@@ -682,10 +660,10 @@ class SalonController extends Controller
      {
         try{
             $stylist = $this->findStylistById(Auth::id());
-            $salon = Salon::find($stylist->salon_id);
-            $images = json_decode($salon->images);
+            $salon   = Salon::find($stylist->salon_id);
+            $images  = json_decode($salon->images);
 
-            foreach ($images as $key => $value){
+            foreach ($images as $key => $value) {
                 $path = public_path().'/uploads/salon/'. $id .'/'. $value;
                 File::delete($path);
             }
@@ -724,14 +702,32 @@ class SalonController extends Controller
         $request->validate([
             'email' => 'required|string|email',
         ]);
-
-        $user = User::where('email', $request->email)
-                    ->where('user_type','stylist')->first();
+        $user           = User::where('email', $request->email)
+                                ->where('user_type','stylist')->first();
 
         if (!$user) {
             return response()->json([
                 'message' => 'We can\'t find a user with that e-mail address.'
                 ], 404);
+        }
+
+        $stylist        = $this->findStylistById(Auth::id());
+        $beautyPro      = $this->getStylistByEmail($request->email);
+        $isAlreadyExist = SalonEmployee::where('salon_id',$stylist->salon_id)
+                                        ->where('stylist_id', $beautyPro->stylist_id)->first();
+
+        if ($isAlreadyExist) {
+            return response()->json([
+            'message' => 'Beauty Pro is aleardy exist.'
+                ], 422);
+        }
+
+        $isJoinedToAnotherSalon =  SalonEmployee::find($beautyPro->stylist_id);
+
+        if ($isJoinedToAnotherSalon) {
+            return response()->json([
+                'message' => 'Beauty Pro employeed at another salon'
+                ], 422);
         }
 
         $invitation = Invitation::updateOrCreate(
@@ -743,16 +739,14 @@ class SalonController extends Controller
              ]
         );
 
-        $stylist = $this->findStylistById(Auth::id());
-
         if ($user && $invitation) {
             $user->notify(
                 new SalonInvitation($stylist->salon_id)
             );
 
             return response()->json([
-                'message' => 'Invitation sent to '.$user->email ]
-                 , 200);
+                'message' => 'Invitation sent to '.$user->email 
+                ], 200);
         }
     }
 
@@ -792,15 +786,16 @@ class SalonController extends Controller
             $workTimes                      = Salon::find($id)->workTime;
 
             if ($workTimes) {
-                $mySalon['workingTimes']    = [
-                                                'monday'    => json_decode($workTimes->monday),
-                                                'tuesday'   => json_decode($workTimes->tuesday),
-                                                'wednesday' => json_decode($workTimes->wednesday),
-                                                'thursday'  => json_decode($workTimes->thursday),
-                                                'friday'    => json_decode($workTimes->friday),
-                                                'saturday'  => json_decode($workTimes->saturday),
-                                                'sunday'    => json_decode($workTimes->sunday),
-                                             ];
+                $mySalon['workingTimes']    =
+                [
+                    'monday'    => json_decode($workTimes->monday),
+                    'tuesday'   => json_decode($workTimes->tuesday),
+                    'wednesday' => json_decode($workTimes->wednesday),
+                    'thursday'  => json_decode($workTimes->thursday),
+                    'friday'    => json_decode($workTimes->friday),
+                    'saturday'  => json_decode($workTimes->saturday),
+                    'sunday'    => json_decode($workTimes->sunday),
+                 ];
             }
 
             $salonEmployee                  = Salon::find($id)->beautyPro;
@@ -878,7 +873,7 @@ class SalonController extends Controller
     }
     /**
      * @SWG\Get(
-     *     path="/api/show_my_beauty_pro",
+     *     path="/api/salon/show_my_beauty_pro",
      *     summary="show my salons's beauty pro",
      *     tags={"Salon"},
      *     description="show my salons's beauty pro workers",
@@ -915,7 +910,7 @@ class SalonController extends Controller
 
     /**
      * @SWG\Get(
-     *     path="/api/salon/exclude/{beauty_pro_id}",
+     *     path="/api/salon/exclude/{username}",
      *     summary="ecxlude salon's beauty professional",
      *     tags={"Salon"},
      *     description="ecxlude salon's beauty professional",
@@ -933,12 +928,14 @@ class SalonController extends Controller
      *     ),
      * )
      */
-    public function deleteMyBeautyPro($id)
+    public function deleteMyBeautyPro($username)
     {
         try{
-            $stylist       = $this->findStylistById(Auth::id());
+
+            $stylist       = $this->getStylistByUsername($username);
             $salonEmployee = SalonEmployee::where('salon_id',$stylist->salon_id)
-                                            ->where('stylist_id',$id)->delete();
+                                            ->where('stylist_id',$stylist->stylist_id)->delete();
+
             if ($salonEmployee) {
 
                 return response()->json(['message'=>'BeautyPro Excluded'], 200);
@@ -951,4 +948,80 @@ class SalonController extends Controller
             return response()->json(['error' => 'something went wrong!'], 500);
         }
      }
+
+    public function getStylistByUsername($username)
+    {
+        $stylist = DB::table('stylists')
+                    ->join('users', 'stylists.user_id', '=', 'users.id')
+                    ->select('stylists.id as stylist_id',
+                             'stylists.salon_id',
+                             'stylists.is_salon_owner',
+                             'users.id as user_id',
+                             'users.username',
+                             'users.email',
+                             'users.fullname',
+                             'users.age',
+                             'users.phone_number',
+                             'users.whats_app',
+                             'users.address',
+                             'users.introduction',
+                             'users.longitude',
+                             'users.latitude',
+                             'users.profile_photo',
+                             'users.background_photo',
+                             'users.user_type'
+                    )
+                    ->where('users.username', '=', $username)
+                    ->first();
+
+     return $stylist;
+    }
+
+    public function getStylistByEmail($email)
+    {
+        $stylist = DB::table('stylists')
+                    ->join('users', 'stylists.user_id', '=', 'users.id')
+                    ->select('stylists.id as stylist_id',
+                             'stylists.salon_id',
+                             'stylists.is_salon_owner',
+                             'users.id as user_id',
+                             'users.username',
+                             'users.email',
+                             'users.fullname',
+                             'users.age',
+                             'users.phone_number',
+                             'users.whats_app',
+                             'users.address',
+                             'users.introduction',
+                             'users.longitude',
+                             'users.latitude',
+                             'users.profile_photo',
+                             'users.background_photo',
+                             'users.user_type'
+                    )
+                    ->where('users.email', '=', $email)
+                    ->first();
+
+     return $stylist;
+    }
+
+    public function addMeToSalonStaff()
+    {
+        try{
+            $stylist         = $this->findStylistById(Auth::id());
+            $meAsStaffMember = SalonEmployee::where('salon_id',$stylist->salon_id)
+                                            ->where('stylist_id',$stylist->stylist_id)->first();
+
+            if ($salonEmployee) {
+
+                return response()->json(['message'=>'You already exist'], 200);
+            } else {
+
+                // add me to salon staff
+            }
+
+        } catch (Exception $e) {
+            return response()->json(['error' => 'something went wrong!'], 500);
+        }
+    }
 }

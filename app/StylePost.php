@@ -47,8 +47,8 @@ class StylePost extends Model
          'tags',
          'brand_name',
          'style_name',
-         'color'
-
+         'color',
+         'views'
     ];
 
     public function stylist()
