@@ -21,6 +21,7 @@ class CreateStylePostsTable extends Migration
             $table->string('brand_name')->nullable();
             $table->string('style_name')->nullable();
             $table->string('color')->nullable();
+            $table->BigInteger('views')->default(0);
             $table->unsignedBigInteger('stylist_id')->nullable(); 
             $table->foreign('stylist_id')->references('id')->on('stylists'); 
             $table->timestamps();

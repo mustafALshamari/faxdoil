@@ -13,7 +13,7 @@ class CreateInvitaionsTable extends Migration
      */
     public function up()
     {
-        Schema::create('invitaions', function (Blueprint $table) {
+        Schema::create('invitations', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('token')->index();
             $table->string('name');

@@ -17,8 +17,8 @@ class CreatePostLikesTable extends Migration
             $table->bigIncrements('id');
             $table->unsignedBigInteger('user_id')->nullable();
             $table->foreign('user_id')->references('id')->on('users'); 
-            $table->unsignedBigInteger('post_id')->nullable();
-            $table->foreign('post_id')->references('id')->on('style_posts'); 
+            $table->unsignedBigInteger('style_post_id')->nullable();
+            $table->foreign('style_post_id')->references('id')->on('style_posts'); 
             $table->timestamps();
         });
     }
