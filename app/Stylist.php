@@ -94,6 +94,6 @@ class Stylist extends Model
 
     public function stylePost()
     {
-        return $this->hasMany('App\StylePost');
+        return $this->hasMany('App\StylePost')->latest();
     }
 }
