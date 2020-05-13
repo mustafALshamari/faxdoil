@@ -211,7 +211,6 @@ class StylePostController extends Controller
      *     tags={"StylePost"},
      *     description="delete some style post'",
      *     security={{"passport": {}}},
- 
      *     @SWG\Response(
      *         response=200,
      *         description="show all post for stylist",
@@ -272,7 +271,7 @@ class StylePostController extends Controller
      */
     public function showPost($id)
     {
-        // try {
+        try {
             $stylePost = StylePost::findOrfail($id);
             $stylePost->Increment('views');
     
@@ -308,9 +307,9 @@ class StylePostController extends Controller
                 return response()->json(['post' => $stylePost] , 200);
             }
 
-        // } catch (Exception $e) {
-        //     return response()->json(['error' => 'something went wrong!'], 500);
-        // }
+        } catch (Exception $e) {
+            return response()->json(['error' => 'something went wrong!'], 500);
+        }
     }
 
     /**
@@ -512,7 +511,7 @@ class StylePostController extends Controller
         try {
             $post = StylePost::findOrfail($post_id);
             $like = PostLike::where('style_post_id', $post->id)
-                                        ->where('user_id', Auth::id())->delete();
+                            ->where('user_id', Auth::id())->delete();
         } catch (Exception $e) {
             return response()->json(['error' => 'something went wrong!'], 500);
         }    
@@ -544,11 +543,11 @@ class StylePostController extends Controller
      * )
      */
     public function reportPost(Request $request , $post_id)
-            { 
-                $validator =  Validator::make(
-                $request->all() ,[
-                'report'     => 'required',
-                ]);
+    { 
+        $validator =  Validator::make(
+        $request->all() ,[
+        'report'     => 'required',
+        ]);
 
         try {
             if ($validator->fails()) {
@@ -560,7 +559,6 @@ class StylePostController extends Controller
             $reportModel->user_id       = Auth::id();
             $reportModel->style_post_id = $post->id;
             $reportModel->report        = $request->report;
-
 
             $reportModel->save();
 
@@ -613,7 +611,6 @@ class StylePostController extends Controller
             $postComment->user_id       = Auth::id();
             $postComment->style_post_id = $post->id;
             $postComment->comment       = $request->comment;
-
 
             $postComment->save();
 
