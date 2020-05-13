@@ -256,7 +256,6 @@ class SalonController extends Controller
      *         required=false,
      *         type="string",
      *     ),
-
      *    @SWG\Parameter(
      *         name="working_days[]",
      *         in="path",
@@ -325,7 +324,7 @@ class SalonController extends Controller
             $removeService = Services::where('salon_id', $stylist->salon_id)->delete();
 
             if ($request->service_name) {
-                foreach($request->service_name as $service) {
+                foreach ($request->service_name as $service) {
                     $sevicesModel           = new Services();
                     $sevicesModel->name     = $service;
                     $sevicesModel->salon_id = $stylist->salon_id;
@@ -618,13 +617,6 @@ class SalonController extends Controller
      *         required=true,
      *         type="string",
      *     ),
-     *     @SWG\Parameter(
-     *         name="price",
-     *         in="path",
-     *         description="price",
-     *         required=true,
-     *         type="string",
-     *     ),
      *     @SWG\Response(
      *         response=200,
      *         description="service updated successfuly",
@@ -655,7 +647,7 @@ class SalonController extends Controller
 
             $salonOwner    = $this->findStylistById(Auth::id());
             $service       =  Services::where('salon_id', $salonOwner->salon_id)
-                                    ->where('id',$id);
+                                      ->where('id',$id);
             $service->name  = $request->name;
 
             return response()->json(['service' => $service, 'message' => 'service updateed'] , 200);
@@ -668,10 +660,10 @@ class SalonController extends Controller
      {
         try{
             $stylist = $this->findStylistById(Auth::id());
-            $salon = Salon::find($stylist->salon_id);
-            $images = json_decode($salon->images);
+            $salon   = Salon::find($stylist->salon_id);
+            $images  = json_decode($salon->images);
 
-            foreach ($images as $key => $value){
+            foreach ($images as $key => $value) {
                 $path = public_path().'/uploads/salon/'. $id .'/'. $value;
                 File::delete($path);
             }
@@ -710,9 +702,8 @@ class SalonController extends Controller
         $request->validate([
             'email' => 'required|string|email',
         ]);
-
         $user           = User::where('email', $request->email)
-                        ->where('user_type','stylist')->first();
+                                ->where('user_type','stylist')->first();
 
         if (!$user) {
             return response()->json([
@@ -721,10 +712,7 @@ class SalonController extends Controller
         }
 
         $stylist        = $this->findStylistById(Auth::id());
-
         $beautyPro      = $this->getStylistByEmail($request->email);
-
-
         $isAlreadyExist = SalonEmployee::where('salon_id',$stylist->salon_id)
                                         ->where('stylist_id', $beautyPro->stylist_id)->first();
 
@@ -736,10 +724,9 @@ class SalonController extends Controller
 
         $isJoinedToAnotherSalon =  SalonEmployee::find($beautyPro->stylist_id);
 
-
         if ($isJoinedToAnotherSalon) {
             return response()->json([
-            'message' => 'Beauty Pro employeed at another salon'
+                'message' => 'Beauty Pro employeed at another salon'
                 ], 422);
         }
 
@@ -758,8 +745,8 @@ class SalonController extends Controller
             );
 
             return response()->json([
-                'message' => 'Invitation sent to '.$user->email ]
-                 , 200);
+                'message' => 'Invitation sent to '.$user->email 
+                ], 200);
         }
     }
 
@@ -923,7 +910,7 @@ class SalonController extends Controller
 
     /**
      * @SWG\Get(
-     *     path="/api/salon/exclude/{beauty_pro_id}",
+     *     path="/api/salon/exclude/{username}",
      *     summary="ecxlude salon's beauty professional",
      *     tags={"Salon"},
      *     description="ecxlude salon's beauty professional",
