@@ -237,12 +237,19 @@ class StylePostController extends Controller
                             'introduction']
                             );
             $showAllPost = Stylist::find($stylist->id)->stylePost;
-               
+
             foreach ($showAllPost as $post ){
-                $data[] = [
-                            'post'   => $post,
-                            'auther' => $auther
-                          ];
+                $path = public_path().'/uploads/style_post/'. $stylist->user_id .'/';
+
+                foreach(json_decode($post->media) as $image) {
+                    $postmedia[] = $path . $image;
+                }
+
+                $post['media'] = $postmedia;
+                $data[]        = [
+                                    'post'   => $post,
+                                    'auther' => $auther
+                                ];
             }
 
             return response()->json(['showAllPost'  => $data] , 200);
@@ -295,7 +302,7 @@ class StylePostController extends Controller
                                         ->get();
             $stylePost['views']    = $stylePost->views ;
 
-            $path    = public_path().'/uploads/style_post/'. $stylist->user_id .'/';
+            $path   = public_path().'/uploads/style_post/'. $stylist->user_id .'/';
 
             foreach(json_decode($stylePost->media) as $image) {
                 $postmedia[] = $path . $image;

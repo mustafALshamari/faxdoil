@@ -407,7 +407,7 @@ class SalonController extends Controller
                 }
                 $mySalon['beautyProfessionals'] = $beautyPro;
             } else {
-                $mySalon['beautyProfessionals'] = 'No Beauty Pro Found';
+                $mySalon['beautyProfessionals'] = [];
             }
 
 
@@ -418,7 +418,7 @@ class SalonController extends Controller
                 $mySalon['images'] = $allImages;
 
             } else {
-                $mySalon['images'] = 'no images';
+                $mySalon['images'] = [];
             }
 
             return response()->json(['salon' => $mySalon], 200);
