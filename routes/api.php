@@ -70,7 +70,7 @@ use Illuminate\Http\Request;
             Route::post('put_like/{post_id}', 'Stylist\StylePostController@putLikeToPost');
             //post report
             Route::post('report_post/{post_id}', 'Stylist\StylePostController@reportPost');
-            //comment 
+            //comment
             Route::post('create_comment/{post_id}', 'Stylist\StylePostController@createComment');
             Route::post('update_comment/{id}', 'Stylist\StylePostController@updateComment');
             Route::get('delete_comment/{id}', 'Stylist\StylePostController@deleteComment');
@@ -80,5 +80,9 @@ use Illuminate\Http\Request;
     //for admin
     Route::group(['prefix'=>'admin'], function () {
         Route::post('register', 'Admin\AuthController@register');
+        //  Articles
+        Route::post('add_article', 'Admin\ArticlesController@addArticle');
+        Route::get('show_article', 'Admin\ArticlesController@showArticle');
+        Route::post('update_article/{article}', 'Admin\ArticlesController@updateArticle');
     });
 

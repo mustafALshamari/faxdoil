@@ -74,16 +74,9 @@ class SalonController extends Controller
      *         type="string",
      *     ),
      *    @SWG\Parameter(
-     *         name="item_name[]",
+     *         name="item[]",
      *         in="path",
-     *         description="item_name",
-     *         required=false,
-     *         type="string",
-     *     ),
-     *    @SWG\Parameter(
-     *         name="item_price[]",
-     *         in="path",
-     *         description="item_price",
+     *         description="item array has item_name and item_price",
      *         required=false,
      *         type="string",
      *     ),
@@ -116,8 +109,7 @@ class SalonController extends Controller
             'location'          => '',
             'images.*'          => 'mimes:jpg,jpeg,gif,png',
             'service_name'      => 'array',
-            'item_name'         => 'array',
-            'item_price'        => 'array'
+            'item'              => 'array',
         ]);
 
         try {
@@ -174,15 +166,15 @@ class SalonController extends Controller
 
            $services = Salon::find($salon->id)->service;
 
-           if ($request->item_name) {
-                foreach ( $request->item_name as $key => $value){
+           if ($request->item) {
+                foreach ( $request->item as $value){
                     $dataForMenu = [
-                        'item_name'  => $request->item_name[$key],
-                        'item_price' => $request->item_price[$key] ,
+                        'item_name'  => $value['item_name'],
+                        'item_price' => $value['item_price'] ,
                         'salon_id'   => $salon->id
                     ];
-                  $menu =  SalonMenu::insert($dataForMenu);
-               }
+                    $menu =  SalonMenu::insert($dataForMenu);
+                }
             }
 
            $workModel = new SalonWorkTime();
@@ -258,19 +250,13 @@ class SalonController extends Controller
      *         type="string",
      *     ),
      *    @SWG\Parameter(
-     *         name="item_name[]",
+     *         name="item[]",
      *         in="path",
-     *         description="item_name",
+     *         description="item array has item_name and item_price",
      *         required=false,
      *         type="string",
      *     ),
-     *    @SWG\Parameter(
-     *         name="item_price[]",
-     *         in="path",
-     *         description="item_price",
-     *         required=false,
-     *         type="string",
-     *     ),
+
      *    @SWG\Parameter(
      *         name="working_days[]",
      *         in="path",
@@ -307,7 +293,7 @@ class SalonController extends Controller
         try {
             $stylist = $this->findStylistById(Auth::id());
             $salon   = Salon::find($stylist->salon_id);
-            
+
             if ($validator->fails()) {
                 return response()->json(['error' => $validator->errors()], 422);
             }
@@ -317,7 +303,7 @@ class SalonController extends Controller
             }
 
             if ($request->location) {
-                foreach ($request->location as  $value){
+                foreach ($request->location as $key => $value){
                     $salon->address    = $value['address'];
                     $salon->latitude   = $value['latitude'];
                     $salon->longitude  = $value['longitude'];
@@ -732,13 +718,13 @@ class SalonController extends Controller
             return response()->json([
                 'message' => 'We can\'t find a user with that e-mail address.'
                 ], 404);
-        }                
+        }
 
         $stylist        = $this->findStylistById(Auth::id());
 
         $beautyPro      = $this->getStylistByEmail($request->email);
-        
- 
+
+
         $isAlreadyExist = SalonEmployee::where('salon_id',$stylist->salon_id)
                                         ->where('stylist_id', $beautyPro->stylist_id)->first();
 
@@ -747,10 +733,10 @@ class SalonController extends Controller
             'message' => 'Beauty Pro is aleardy exist.'
                 ], 422);
         }
-    
-        $isJoinedToAnotherSalon =  SalonEmployee::find($beautyPro->stylist_id);   
 
-        
+        $isJoinedToAnotherSalon =  SalonEmployee::find($beautyPro->stylist_id);
+
+
         if ($isJoinedToAnotherSalon) {
             return response()->json([
             'message' => 'Beauty Pro employeed at another salon'
@@ -813,7 +799,7 @@ class SalonController extends Controller
             $workTimes                      = Salon::find($id)->workTime;
 
             if ($workTimes) {
-                $mySalon['workingTimes']    = 
+                $mySalon['workingTimes']    =
                 [
                     'monday'    => json_decode($workTimes->monday),
                     'tuesday'   => json_decode($workTimes->tuesday),
@@ -975,7 +961,7 @@ class SalonController extends Controller
             return response()->json(['error' => 'something went wrong!'], 500);
         }
      }
-     
+
     public function getStylistByUsername($username)
     {
         $stylist = DB::table('stylists')
@@ -1044,7 +1030,7 @@ class SalonController extends Controller
                 return response()->json(['message'=>'You already exist'], 200);
             } else {
 
-                // add me to salon staff 
+                // add me to salon staff
             }
 
         } catch (Exception $e) {

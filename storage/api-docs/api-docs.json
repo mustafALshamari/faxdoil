@@ -324,16 +324,9 @@
                         "type": "string"
                     },
                     {
-                        "name": "item_name[]",
+                        "name": "item[]",
                         "in": "path",
-                        "description": "item_name",
-                        "required": false,
-                        "type": "string"
-                    },
-                    {
-                        "name": "item_price[]",
-                        "in": "path",
-                        "description": "item_price",
+                        "description": "item array has item_name and item_price",
                         "required": false,
                         "type": "string"
                     },
@@ -414,16 +407,9 @@
                         "type": "string"
                     },
                     {
-                        "name": "item_name[]",
+                        "name": "item[]",
                         "in": "path",
-                        "description": "item_name",
-                        "required": false,
-                        "type": "string"
-                    },
-                    {
-                        "name": "item_price[]",
-                        "in": "path",
-                        "description": "item_price",
+                        "description": "item array has item_name and item_price",
                         "required": false,
                         "type": "string"
                     },
