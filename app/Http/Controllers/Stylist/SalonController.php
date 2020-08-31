@@ -276,6 +276,8 @@ class SalonController extends Controller
      *         description="error something went wrong",
      *     ),
      * )
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
      */
     public function updateSalon(Request $request)
     {
@@ -745,7 +747,7 @@ class SalonController extends Controller
             );
 
             return response()->json([
-                'message' => 'Invitation sent to '.$user->email 
+                'message' => 'Invitation sent to '.$user->email
                 ], 200);
         }
     }
